@@ -32,8 +32,7 @@ Avant de commencer, assurez-vous d'avoir installé les outils suivants :
    - Forker ce dépôt sur votre compte GitHub.
    - Cloner votre fork localement :
      ```bash
-     git clone https://github.com/VOTRE_UTILISATEUR/nom-du-projet.git
-     cd nom-du-projet
+     git clone https://github.com/VOTRE_UTILISATEUR/miabePharmacie.git
      ```
 
 2. **Configurer Firebase :**
