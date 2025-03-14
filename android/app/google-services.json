@@ -12,7 +12,12 @@
           "package_name": "com.example.miabe_pharmacie"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "501841860383-bps152c6aja38d1gmp68q8leaapoouci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDFAaqe7HyKOMWI-lo5eSKFkpVn1Mrr5qA"
@@ -20,10 +25,15 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "501841860383-bps152c6aja38d1gmp68q8leaapoouci.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
   ],
   "configuration_version": "1"
-}
+} 
