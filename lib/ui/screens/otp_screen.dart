@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'home_screen.dart';
-import 'dart:async';
+import 'package:miabe_pharmacie/viewmodels/auth_view_model.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -12,8 +12,8 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   List<TextEditingController> otpControllers =
-  List.generate(4, (index) => TextEditingController());
-  int countdown = 60; // Temps en secondes
+      List.generate(4, (index) => TextEditingController());
+  int countdown = 60;
   late Timer _timer;
 
   @override
@@ -25,9 +25,7 @@ class _OtpScreenState extends State<OtpScreen> {
   void startCountdown() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (countdown > 0) {
-        setState(() {
-          countdown--;
-        });
+        setState(() => countdown--);
       } else {
         timer.cancel();
       }
@@ -35,14 +33,10 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void verifyOtp() {
-    // Simulation de validation OTP
+    final AuthViewModel authViewModel = Get.find();
     String otp = otpControllers.map((controller) => controller.text).join();
-    if (otp.length == 4) {
-      Get.off(() => const HomeScreen()); // Aller à la page d'accueil
-    } else {
-      Get.snackbar("Erreur", "Veuillez entrer un code OTP valide",
-          snackPosition: SnackPosition.BOTTOM);
-    }
+    String verificationId = Get.arguments;
+    authViewModel.verifyOTP(verificationId, otp);
   }
 
   @override
@@ -53,41 +47,26 @@ class _OtpScreenState extends State<OtpScreen> {
         child: Column(
           children: [
             const SizedBox(height: 50),
-            Image.asset(
-              'lib/assets/images/logo.png',
-              height: 120,
-            ),
+            Image.asset('lib/assets/images/logo.png', height: 120),
             const SizedBox(height: 20),
-            const Text(
-              'MIAWOÉ ZON',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('MIAWOÉ ZON',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            const Text(
-              'Vérification OTP Par Mail',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-              ),
-            ),
+            const Text('Vérification OTP',
+                style: TextStyle(color: Colors.white, fontSize: 20)),
             const SizedBox(height: 10),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                "Nous vous avons envoyé un code de vérification sur votre adresse e-mail. Veuillez le saisir ici.",
+                "Entrez le code de vérification envoyé.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
             const Spacer(),
-            // Section blanche contenant les champs OTP et les boutons
             Container(
               width: double.infinity,
               height: 400,
@@ -98,22 +77,17 @@ class _OtpScreenState extends State<OtpScreen> {
               padding: const EdgeInsets.all(30),
               child: Column(
                 children: [
-                  const Text(
-                    'Vérification',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFF6AAB64),
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('Vérification',
+                      style: TextStyle(
+                          color: Color(0xFF6AAB64),
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold)),
                   const SizedBox(height: 15),
-                  // Champs OTP
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(
                       4,
-                          (index) => SizedBox(
+                      (index) => SizedBox(
                         width: 50,
                         height: 50,
                         child: TextField(
@@ -135,7 +109,6 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Bouton "Vérifier"
                   InkWell(
                     onTap: verifyOtp,
                     child: Container(
@@ -145,35 +118,28 @@ class _OtpScreenState extends State<OtpScreen> {
                         color: const Color(0xFF6AAB64),
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      child: const Text(
-                        'Vérifier',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
+                      child: const Text('Vérifier',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 18)),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Texte du compte à rebours
                   Text(
                     countdown > 0
-                        ? "Si vous n'avez pas encore reçu le code de vérification, détendez-vous ! Nous vous l'enverrons dans $countdown secondes."
+                        ? "Renvoyer dans $countdown secondes."
                         : "Vous pouvez renvoyer un nouveau code.",
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 14),
                   ),
                   const SizedBox(height: 10),
-                  // Bouton "Renvoyer"
                   InkWell(
                     onTap: countdown == 0
                         ? () {
-                      setState(() {
-                        countdown = 60;
-                        startCountdown();
-                      });
-                    }
+                            setState(() {
+                              countdown = 60;
+                              startCountdown();
+                            });
+                          }
                         : null,
                     child: Container(
                       width: double.infinity,
