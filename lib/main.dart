@@ -10,7 +10,7 @@ import 'ui/screens/otp_screen.dart';
 import 'ui/screens/home_screen.dart';
 import 'ui/screens/register_screen.dart';
 import 'services/auth_service.dart';
-import 'package:miabe_pharmacie/viewmodels/auth_view_model.dart';
+import 'viewmodels/auth_view_model.dart';
 import 'firebase_options.dart';
 
 void main() async {

@@ -13,6 +13,7 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   List<TextEditingController> otpControllers =
       List.generate(4, (index) => TextEditingController());
+  List<FocusNode> focusNodes = List.generate(4, (index) => FocusNode());
   int countdown = 60;
   late Timer _timer;
 
@@ -32,11 +33,36 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
-  void verifyOtp() {
-    final AuthViewModel authViewModel = Get.find();
-    String otp = otpControllers.map((controller) => controller.text).join();
-    String verificationId = Get.arguments;
-    authViewModel.verifyOTP(verificationId, otp);
+ void verifyOtp() async {
+  final AuthViewModel authViewModel = Get.find();
+  String otp = otpControllers.map((controller) => controller.text).join();
+  String verificationId = Get.arguments;
+
+  // Ajoutez des logs pour vérifier les valeurs
+  print('Verification ID: "$verificationId"');
+  print('Entered OTP: "$otp"');
+
+  // Appel de la méthode de vérification
+  bool isSuccess = await authViewModel.verifyOTP(verificationId, otp);
+
+  if (isSuccess) {
+    // Navigation vers HomeScreen en cas de succès
+    Get.offAllNamed('/home');
+  } else {
+    // Afficher un message d'erreur en cas d'échec
+    Get.snackbar('Échec de la vérification', 'Le code OTP est incorrect. Veuillez réessayer.');
+  }
+}
+
+
+  void _onOtpChanged(String value, int index) {
+    if (value.length == 1) {
+      if (index < 3) {
+        FocusScope.of(context).requestFocus(focusNodes[index + 1]);
+      } else {
+        verifyOtp();
+      }
+    }
   }
 
   @override
@@ -92,9 +118,11 @@ class _OtpScreenState extends State<OtpScreen> {
                         height: 50,
                         child: TextField(
                           controller: otpControllers[index],
+                          focusNode: focusNodes[index],
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           maxLength: 1,
+                          onChanged: (value) => _onOtpChanged(value, index),
                           decoration: InputDecoration(
                             counterText: "",
                             filled: true,
@@ -170,6 +198,12 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   void dispose() {
     _timer.cancel();
+    for (var controller in otpControllers) {
+      controller.dispose();
+    }
+    for (var node in focusNodes) {
+      node.dispose();
+    }
     super.dispose();
   }
 }

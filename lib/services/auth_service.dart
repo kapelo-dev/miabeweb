@@ -125,8 +125,9 @@ class AuthService {
 
       await _firestore.collection('utilisateur').doc(userId).set({
         'email': email ?? '',
-        'phoneNumber': phoneNumber ?? '',
-        'name': name ?? '',
+        'telephone': phoneNumber ?? '',
+        'nom_prenom': name ?? '',
+        'adresse': '',
         'password': _hashPassword(password),
         'createdAt': FieldValue.serverTimestamp(),
       });
@@ -158,9 +159,10 @@ class AuthService {
       if (!doc.exists) {
         await _firestore.collection('users').doc(user.email).set({
           'email': user.email,
-          'phoneNumber': '',
-          'name': user.displayName ?? '',
+          'telephone': '',
+          'nom_prenom': user.displayName ?? '',
           'password': '',
+          'adresse': '',
           'createdAt': FieldValue.serverTimestamp(),
         });
       }
@@ -173,26 +175,34 @@ class AuthService {
     }
   }
 
-  Future<bool> verifyOtp(String verificationId, String code) async {
-    try {
-      String? storedOtp = _prefs.getString('tempOtp');
-      String? tempUserId = _prefs.getString('tempUserId');
-      if (storedOtp == code && tempUserId != null) {
-        final doc = await _firestore.collection('users').doc(tempUserId).get();
-        if (!doc.exists) {
-          return false; // L'utilisateur n'existe pas dans Firestore
-        }
-        await _prefs.setBool('isAuthenticated', true);
-        await _prefs.setString('userId', tempUserId);
-        await _prefs.remove('tempOtp');
-        await _prefs.remove('tempUserId');
-        return true;
+ Future<bool> verifyOtp(String verificationId, String code) async {
+  try {
+    String? storedOtp = _prefs.getString('tempOtp');
+    String? tempUserId = _prefs.getString('tempUserId');
+
+    // Ajoutez des logs pour vérifier les valeurs
+    print('Stored OTP: "$storedOtp"');
+    print('Entered OTP: "$code"');
+    print('Temp User ID: $tempUserId');
+
+    if (storedOtp == code && tempUserId != null) {
+      final doc = await _firestore.collection('users').doc(tempUserId).get();
+      if (!doc.exists) {
+        return false; // L'utilisateur n'existe pas dans Firestore
       }
-      return false;
-    } catch (e) {
-      throw 'Erreur lors de la vérification OTP : $e';
+      await _prefs.setBool('isAuthenticated', true);
+      await _prefs.setString('userId', tempUserId);
+      await _prefs.remove('tempOtp');
+      await _prefs.remove('tempUserId');
+      return true;
     }
+    return false;
+  } catch (e) {
+    print('Error during OTP verification: $e');
+    throw 'Erreur lors de la vérification OTP : $e';
   }
+}
+
 
   Future<void> signOut() async {
     await _googleSignIn.signOut();

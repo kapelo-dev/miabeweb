@@ -91,7 +91,7 @@ class AuthViewModel extends GetxController {
     isLoading.value = true;
     try {
       bool success = await _authService.verifyOtp(verificationId, code);
-      if (success) Get.offNamed('/home');
+      if (success) Get.offAllNamed('/home');
       return success;
     } catch (e) {
       error.value = e.toString();
