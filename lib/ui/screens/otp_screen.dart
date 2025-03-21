@@ -33,36 +33,29 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
- void verifyOtp() async {
-  final AuthViewModel authViewModel = Get.find();
-  String otp = otpControllers.map((controller) => controller.text).join();
-  String verificationId = Get.arguments;
+  void verifyOtp() async {
+    final AuthViewModel authViewModel = Get.find();
+    String otp = otpControllers.map((controller) => controller.text).join();
+    String verificationId = Get.arguments;
 
-  // Ajoutez des logs pour vérifier les valeurs
-  print('Verification ID: "$verificationId"');
-  print('Entered OTP: "$otp"');
+    print('Verification ID: "$verificationId"');
+    print('Entered OTP: "$otp"');
 
-  // Appel de la méthode de vérification
-  bool isSuccess = await authViewModel.verifyOTP(verificationId, otp);
+    bool isSuccess = await authViewModel.verifyOTP(verificationId, otp);
 
-  if (isSuccess) {
-    // Navigation vers HomeScreen en cas de succès
-    Get.offAllNamed('/home');
-  } else {
-    // Afficher un message d'erreur en cas d'échec
-    Get.snackbar('Échec de la vérification', 'Le code OTP est incorrect. Veuillez réessayer.');
+    if (isSuccess) {
+      Get.offAllNamed('/home');
+    } else {
+      Get.snackbar('Échec de la vérification',
+          'Le code OTP est incorrect. Veuillez réessayer.');
+    }
   }
-}
-
 
   void _onOtpChanged(String value, int index) {
-    if (value.length == 1) {
-      if (index < 3) {
-        FocusScope.of(context).requestFocus(focusNodes[index + 1]);
-      } else {
-        verifyOtp();
-      }
+    if (value.length == 1 && index < 3) {
+      FocusScope.of(context).requestFocus(focusNodes[index + 1]);
     }
+    // Supprime l'appel automatique à verifyOtp ici
   }
 
   @override
@@ -138,7 +131,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                   const SizedBox(height: 20),
                   InkWell(
-                    onTap: verifyOtp,
+                    onTap: verifyOtp, // Vérification uniquement ici
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 15),
