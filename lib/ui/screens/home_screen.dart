@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 import 'chat_screen.dart';
 import 'commande_screen.dart';
 import 'history_screen.dart';
+import 'package:miabe_pharmacie/services/pharmacie_service.dart'; // Assurez-vous que le chemin est correct
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -90,7 +94,114 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class HomeScreenContent extends StatelessWidget {
+class HomeScreenContent extends StatefulWidget {
+  @override
+  _HomeScreenContentState createState() => _HomeScreenContentState();
+}
+
+class _HomeScreenContentState extends State<HomeScreenContent> {
+  final PharmacieService _pharmacieService = PharmacieService();
+  late MapController _mapController;
+  LatLng? _currentLocation;
+  List<Map<String, dynamic>> _nearbyPharmacies = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+    _initializeLocation();
+  }
+
+  Future<void> _initializeLocation() async {
+    try {
+      // Vérifier et demander les permissions
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+          _showError('Permission de localisation refusée.');
+          setState(() => _isLoading = false);
+          return;
+        }
+      }
+
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _showError('Veuillez activer le service de localisation.');
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Obtenir la position actuelle
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentLocation = LatLng(position.latitude, position.longitude);
+        _isLoading = false;
+      });
+      _mapController.move(_currentLocation!, 13.0);
+    } catch (e) {
+      _showError('Erreur lors de la récupération de la localisation : $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _fetchNearbyPharmacies() async {
+    if (_currentLocation == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final pharmacies = await _pharmacieService.getPharmaciesProches(
+        _currentLocation!.latitude,
+        _currentLocation!.longitude,
+        rayon: 3.0,
+        limit: 10,
+      );
+      setState(() {
+        _nearbyPharmacies = List<Map<String, dynamic>>.from(pharmacies);
+        _isLoading = false;
+      });
+      _fitMapToPharmacies();
+    } catch (e) {
+      _showError('Erreur lors de la récupération des pharmacies : $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _fitMapToPharmacies() {
+    if (_nearbyPharmacies.isEmpty || _currentLocation == null) return;
+
+    double minLat = _currentLocation!.latitude;
+    double maxLat = _currentLocation!.latitude;
+    double minLon = _currentLocation!.longitude;
+    double maxLon = _currentLocation!.longitude;
+
+    for (var pharmacy in _nearbyPharmacies) {
+      double lat = pharmacy['latitude'].toDouble();
+      double lon = pharmacy['longitude'].toDouble();
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+      if (lon < minLon) minLon = lon;
+      if (lon > maxLon) maxLon = lon;
+    }
+
+    _mapController.fitCamera(
+      CameraFit.bounds(
+        bounds: LatLngBounds(
+          LatLng(minLat, minLon),
+          LatLng(maxLat, maxLon),
+        ),
+        padding: const EdgeInsets.all(50),
+      ),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -118,7 +229,7 @@ class HomeScreenContent extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _fetchNearbyPharmacies, // Action pour "Pharmacie Ouverte"
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6AAB64),
                     shape: RoundedRectangleBorder(
@@ -134,7 +245,10 @@ class HomeScreenContent extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // À implémenter pour "Pharmacie de Garde" si nécessaire
+                    _showError('Fonctionnalité "Pharmacie de Garde" non implémentée.');
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey.shade400,
                     shape: RoundedRectangleBorder(
@@ -150,10 +264,78 @@ class HomeScreenContent extends StatelessWidget {
             ],
           ),
         ),
-        const Expanded(
-          child: Center(
-            child: Text('Carte sera implémentée plus tard'),
-          ),
+        Expanded(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _currentLocation == null
+                  ? const Center(child: Text('Localisation non disponible'))
+                  : FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        initialCenter: _currentLocation!,
+                        initialZoom: 13.0,
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          subdomains: const ['a', 'b', 'c'],
+                        ),
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              width: 80.0,
+                              height: 80.0,
+                              point: _currentLocation!,
+                              child: const Icon(
+                                Icons.location_on,
+                                color: Colors.blue,
+                                size: 40.0,
+                              ),
+                            ),
+                            ..._nearbyPharmacies.map(
+                              (pharmacy) => Marker(
+                                width: 80.0,
+                                height: 80.0,
+                                point: LatLng(
+                                  pharmacy['latitude'].toDouble(),
+                                  pharmacy['longitude'].toDouble(),
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: Text(pharmacy['nom']),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Emplacement: ${pharmacy['emplacement']}'),
+                                            Text('Téléphone: ${pharmacy['telephone1']}'),
+                                            Text('Distance: ${pharmacy['distance'].toStringAsFixed(2)} km'),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(),
+                                            child: const Text('Fermer'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  child: const Icon(
+                                    Icons.local_pharmacy,
+                                    color: Colors.green,
+                                    size: 40.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
         ),
       ],
     );
