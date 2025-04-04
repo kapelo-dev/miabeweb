@@ -5,46 +5,52 @@ class AuthViewModel extends GetxController {
   final AuthService _authService;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
-  final RxBool _isOtpSent = false.obs; // Ajout pour éviter les appels multiples
+  final RxBool _isOtpSent = false.obs;
 
   AuthViewModel(this._authService);
 
   Future<bool> checkAuthStatus() async => await _authService.isUserLoggedIn();
 
   Future<void> signInWithEmail(String email, String password) async {
-    if (isLoading.value || _isOtpSent.value) return; // Empêche les appels multiples
+    if (isLoading.value || _isOtpSent.value) return;
     isLoading.value = true;
-    _isOtpSent.value = true; // Marque l'OTP comme envoyé
+    _isOtpSent.value = true;
+    error.value = '';
+    
     await _authService.signInWithEmail(
       email: email,
       password: password,
       onCodeSent: (verificationId, otpCode) {
-        Get.snackbar('Code OTP', 'Votre code est : $otpCode',
+        Get.snackbar('Code OTP envoyé', 'Votre code est : $otpCode',
             duration: const Duration(seconds: 10));
         Get.toNamed('/otp', arguments: verificationId);
       },
       onError: (message) {
         error.value = message;
-        _isOtpSent.value = false; // Réinitialise si erreur
+        Get.snackbar('Erreur', message);
+        _isOtpSent.value = false;
       },
     );
     isLoading.value = false;
   }
 
   Future<void> verifyPhoneNumber(String phoneNumber, String password) async {
-    if (isLoading.value || _isOtpSent.value) return; // Empêche les appels multiples
+    if (isLoading.value || _isOtpSent.value) return;
     isLoading.value = true;
     _isOtpSent.value = true;
+    error.value = '';
+    
     await _authService.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       password: password,
       onCodeSent: (verificationId, otpCode) {
-        Get.snackbar('Code OTP', 'Votre code est : $otpCode',
+        Get.snackbar('Code OTP envoyé', 'Votre code est : $otpCode',
             duration: const Duration(seconds: 10));
         Get.toNamed('/otp', arguments: verificationId);
       },
       onError: (message) {
         error.value = message;
+        Get.snackbar('Erreur', message);
         _isOtpSent.value = false;
       },
     );
@@ -52,7 +58,7 @@ class AuthViewModel extends GetxController {
   }
 
   Future<bool> signInWithGoogle() async {
-    if (isLoading.value) return false; // Empêche les appels multiples
+    if (isLoading.value) return false;
     isLoading.value = true;
     try {
       bool success = await _authService.signInWithGoogle();
@@ -60,6 +66,7 @@ class AuthViewModel extends GetxController {
       return success;
     } catch (e) {
       error.value = e.toString();
+      Get.snackbar('Erreur', e.toString());
       return false;
     } finally {
       isLoading.value = false;
@@ -72,21 +79,24 @@ class AuthViewModel extends GetxController {
     required String password,
     String? name,
   }) async {
-    if (isLoading.value || _isOtpSent.value) return; // Empêche les appels multiples
+    if (isLoading.value || _isOtpSent.value) return;
     isLoading.value = true;
     _isOtpSent.value = true;
+    error.value = '';
+    
     await _authService.createUser(
       email: email,
       phoneNumber: phoneNumber,
       password: password,
       name: name,
       onCodeSent: (verificationId, otpCode) {
-        Get.snackbar('Code OTP', 'Votre code est : $otpCode',
+        Get.snackbar('Code OTP envoyé', 'Votre code est : $otpCode',
             duration: const Duration(seconds: 10));
         Get.toNamed('/otp', arguments: verificationId);
       },
       onError: (message) {
         error.value = message;
+        Get.snackbar('Erreur', message);
         _isOtpSent.value = false;
       },
     );
@@ -94,7 +104,7 @@ class AuthViewModel extends GetxController {
   }
 
   Future<bool> createUserWithGoogle() async {
-    if (isLoading.value) return false; // Empêche les appels multiples
+    if (isLoading.value) return false;
     isLoading.value = true;
     try {
       bool success = await _authService.createUserWithGoogle();
@@ -102,6 +112,7 @@ class AuthViewModel extends GetxController {
       return success;
     } catch (e) {
       error.value = e.toString();
+      Get.snackbar('Erreur', e.toString());
       return false;
     } finally {
       isLoading.value = false;
@@ -109,17 +120,22 @@ class AuthViewModel extends GetxController {
   }
 
   Future<bool> verifyOTP(String verificationId, String code) async {
-    if (isLoading.value) return false; // Empêche les appels multiples
+    if (isLoading.value) return false;
     isLoading.value = true;
+    error.value = '';
+    
     try {
       bool success = await _authService.verifyOtp(verificationId, code);
       if (success) {
         Get.offAllNamed('/home');
-        _isOtpSent.value = false; // Réinitialise après succès
+        _isOtpSent.value = false;
+      } else {
+        Get.snackbar('Erreur', 'Code OTP incorrect');
       }
       return success;
     } catch (e) {
       error.value = e.toString();
+      Get.snackbar('Erreur', e.toString());
       return false;
     } finally {
       isLoading.value = false;
@@ -128,7 +144,7 @@ class AuthViewModel extends GetxController {
 
   Future<void> signOut() async {
     await _authService.signOut();
-    _isOtpSent.value = false; // Réinitialise lors de la déconnexion
+    _isOtpSent.value = false;
     Get.offAllNamed('/screen_option');
   }
 }

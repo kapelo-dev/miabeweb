@@ -33,23 +33,34 @@ class AuthService {
     required Function(String) onError,
   }) async {
     try {
-      final doc = await _firestore.collection('utilisateur').doc(email).get();
+      // Normalisation de l'email
+      final normalizedEmail = email.trim().toLowerCase();
+      
+      final doc = await _firestore.collection('utilisateur').doc(normalizedEmail).get();
+      
       if (!doc.exists) {
-        onError('Utilisateur non trouvé dans la base de données');
+        onError('Aucun utilisateur trouvé avec cet email');
         return;
       }
 
       final data = doc.data()!;
+      final storedPassword = data['password'] as String?;
+      
+      if (storedPassword == null || storedPassword.isEmpty) {
+        onError('Compte invalide - mot de passe non défini');
+        return;
+      }
+
       if (data['password'] == _hashPassword(password)) {
         String otp = _generateOtp();
         await _prefs.setString('tempOtp', otp);
-        await _prefs.setString('tempUserId', email);
-        onCodeSent('email-$email', otp);
+        await _prefs.setString('tempUserId', normalizedEmail);
+        onCodeSent('email-$normalizedEmail', otp);
       } else {
         onError('Mot de passe incorrect');
       }
     } catch (e) {
-      onError('Erreur lors de la connexion : $e');
+      onError('Erreur lors de la connexion : ${e.toString()}');
     }
   }
 
@@ -60,23 +71,36 @@ class AuthService {
     required Function(String) onError,
   }) async {
     try {
-      final doc = await _firestore.collection('utilisateur').doc(phoneNumber).get();
+      // Normalisation du numéro de téléphone avec le préfixe +228
+      final normalizedPhone = phoneNumber.startsWith('+228') 
+          ? phoneNumber.trim() 
+          : '+228${phoneNumber.trim()}';
+      
+      final doc = await _firestore.collection('utilisateur').doc(normalizedPhone).get();
+      
       if (!doc.exists) {
-        onError('Utilisateur non trouvé dans la base de données');
+        onError('Aucun utilisateur trouvé avec ce numéro');
         return;
       }
 
       final data = doc.data()!;
+      final storedPassword = data['password'] as String?;
+      
+      if (storedPassword == null || storedPassword.isEmpty) {
+        onError('Compte invalide - mot de passe non défini');
+        return;
+      }
+
       if (data['password'] == _hashPassword(password)) {
         String otp = _generateOtp();
         await _prefs.setString('tempOtp', otp);
-        await _prefs.setString('tempUserId', phoneNumber);
-        onCodeSent('phone-$phoneNumber', otp);
+        await _prefs.setString('tempUserId', normalizedPhone);
+        onCodeSent('phone-$normalizedPhone', otp);
       } else {
         onError('Mot de passe incorrect');
       }
     } catch (e) {
-      onError('Erreur lors de la connexion : $e');
+      onError('Erreur lors de la connexion : ${e.toString()}');
     }
   }
 
@@ -117,13 +141,17 @@ class AuthService {
   }) async {
     try {
       String userId = email ?? phoneNumber!;
-      final doc = await _firestore.collection('utilisateur').doc(userId).get();
+      final normalizedUserId = email != null 
+          ? email.trim().toLowerCase() 
+          : (phoneNumber!.startsWith('+228') ? phoneNumber.trim() : '+228${phoneNumber.trim()}');
+      
+      final doc = await _firestore.collection('utilisateur').doc(normalizedUserId).get();
       if (doc.exists) {
         onError('Utilisateur déjà existant');
         return;
       }
 
-      await _firestore.collection('utilisateur').doc(userId).set({
+      await _firestore.collection('utilisateur').doc(normalizedUserId).set({
         'email': email ?? '',
         'telephone': phoneNumber ?? '',
         'nom_prenom': name ?? '',
@@ -134,8 +162,8 @@ class AuthService {
 
       String otp = _generateOtp();
       await _prefs.setString('tempOtp', otp);
-      await _prefs.setString('tempUserId', userId);
-      onCodeSent('register-$userId', otp);
+      await _prefs.setString('tempUserId', normalizedUserId);
+      onCodeSent('register-$normalizedUserId', otp);
     } catch (e) {
       onError('Erreur lors de la création : $e');
     }
@@ -180,18 +208,23 @@ class AuthService {
       String? storedOtp = _prefs.getString('tempOtp');
       String? tempUserId = _prefs.getString('tempUserId');
 
-      // Ajout de logs pour débogage
+      print('Verification ID: $verificationId');
       print('Stored OTP: "$storedOtp"');
       print('Entered OTP: "$code"');
       print('Temp User ID: $tempUserId');
 
-      if (storedOtp == code && tempUserId != null) {
-        // Correction : utilisation de la collection 'utilisateur' au lieu de 'users'
+      if (storedOtp == null || tempUserId == null) {
+        print('Échec : OTP ou UserID temporaire non trouvé');
+        return false;
+      }
+
+      if (storedOtp == code.trim()) {
         final doc = await _firestore.collection('utilisateur').doc(tempUserId).get();
         if (!doc.exists) {
-          print('Utilisateur non trouvé dans la collection utilisateur pour tempUserId: $tempUserId');
-          return false; // L'utilisateur n'existe pas dans Firestore
+          print('Utilisateur non trouvé pour tempUserId: $tempUserId');
+          return false;
         }
+        
         await _prefs.setBool('isAuthenticated', true);
         await _prefs.setString('userId', tempUserId);
         await _prefs.remove('tempOtp');
@@ -199,7 +232,8 @@ class AuthService {
         print('Vérification OTP réussie');
         return true;
       }
-      print('Échec de la vérification OTP : OTP incorrect ou tempUserId null');
+      
+      print('Échec : OTP incorrect');
       return false;
     } catch (e) {
       print('Erreur lors de la vérification OTP : $e');
