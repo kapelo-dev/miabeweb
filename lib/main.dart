@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Miabé Pharmacie',
       theme: ThemeData(primarySwatch: Colors.green),
       initialRoute: '/',
