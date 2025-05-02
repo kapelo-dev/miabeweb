@@ -5,7 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'chat_screen.dart';
 import 'commande_screen.dart';
-import 'history_screen.dart';
+import 'profile_screen.dart';
 import 'package:miabe_pharmacie/services/pharmacie_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -24,12 +24,13 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeScreenContent(),
     ChatScreen(),
     CommandeScreen(),
-    HistoryScreen(),
+    ProfileScreen(),
   ];
 
   void _loadPharmacies() {
     if (_selectedIndex == 0) {
-      final homeScreenContentState = context.findAncestorStateOfType<_HomeScreenContentState>();
+      final homeScreenContentState =
+          context.findAncestorStateOfType<_HomeScreenContentState>();
       homeScreenContentState?._fetchNearbyPharmacies();
     }
   }
@@ -121,7 +122,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+        if (permission != LocationPermission.whileInUse &&
+            permission != LocationPermission.always) {
           _showError('Permission de localisation refusée.');
           setState(() => _isLoading = false);
           return;
@@ -135,7 +137,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
         return;
       }
 
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
         _isLoading = false;
@@ -213,7 +216,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
       setState(() {
         _isLoading = false;
         _nearbyPharmacies = []; // Vider la liste des pharmacies
-        _errorMessage = 'Erreur lors de la récupération des pharmacies de garde : $e';
+        _errorMessage =
+            'Erreur lors de la récupération des pharmacies de garde : $e';
       });
     }
   }
@@ -224,22 +228,27 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     final currentMinute = now.minute;
     final currentTimeInMinutes = currentHour * 60 + currentMinute;
 
-    return pharmacies.where((pharmacy) {
-      if (pharmacy['ouverture'] == null || pharmacy['fermeture'] == null) {
-        return false; // Exclure les pharmacies sans horaires
-      }
+    return pharmacies
+        .where((pharmacy) {
+          if (pharmacy['ouverture'] == null || pharmacy['fermeture'] == null) {
+            return false; // Exclure les pharmacies sans horaires
+          }
 
-      final openTime = _parseTime(pharmacy['ouverture']);
-      final closeTime = _parseTime(pharmacy['fermeture']);
+          final openTime = _parseTime(pharmacy['ouverture']);
+          final closeTime = _parseTime(pharmacy['fermeture']);
 
-      if (openTime == null || closeTime == null) return false;
+          if (openTime == null || closeTime == null) return false;
 
-      if (closeTime < openTime) {
-        return currentTimeInMinutes >= openTime || currentTimeInMinutes <= closeTime;
-      } else {
-        return currentTimeInMinutes >= openTime && currentTimeInMinutes <= closeTime;
-      }
-    }).toList().cast<Map<String, dynamic>>();
+          if (closeTime < openTime) {
+            return currentTimeInMinutes >= openTime ||
+                currentTimeInMinutes <= closeTime;
+          } else {
+            return currentTimeInMinutes >= openTime &&
+                currentTimeInMinutes <= closeTime;
+          }
+        })
+        .toList()
+        .cast<Map<String, dynamic>>();
   }
 
   int? _parseTime(String time) {
@@ -257,8 +266,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     if (_currentLocation == null) return;
 
     // Ajout de paramètres pour un itinéraire plus précis
-    final url = Uri.parse(
-        'http://router.project-osrm.org/route/v1/driving/'
+    final url = Uri.parse('http://router.project-osrm.org/route/v1/driving/'
         '${_currentLocation!.longitude},${_currentLocation!.latitude};'
         '${destination.longitude},${destination.latitude}'
         '?overview=full&geometries=polyline&steps=true&annotations=true');
@@ -284,7 +292,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
               newRoute[i + 1].latitude,
               newRoute[i + 1].longitude,
             );
-            if (distance > 1000) { // Si la distance entre deux points est > 1km, suspect
+            if (distance > 1000) {
+              // Si la distance entre deux points est > 1km, suspect
               _showError('Itinéraire invalide : points trop éloignés.');
               return;
             }
@@ -298,7 +307,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
           _showError('Aucun itinéraire trouvé.');
         }
       } else {
-        _showError('Échec de la récupération de l\'itinéraire : ${response.statusCode}');
+        _showError(
+            'Échec de la récupération de l\'itinéraire : ${response.statusCode}');
       }
     } catch (e) {
       _showError('Erreur réseau lors de la récupération de l\'itinéraire : $e');
@@ -392,7 +402,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
           LatLng(minLat, minLon),
           LatLng(maxLat, maxLon),
         ),
-        padding: const EdgeInsets.all(30), // Réduction du padding pour un zoom plus serré
+        padding: const EdgeInsets.all(
+            30), // Réduction du padding pour un zoom plus serré
       ),
     );
   }
@@ -432,7 +443,9 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 child: ElevatedButton(
                   onPressed: _fetchNearbyPharmacies,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isGardeActive ? Colors.grey.shade400 : const Color(0xFF6AAB64),
+                    backgroundColor: _isGardeActive
+                        ? Colors.grey.shade400
+                        : const Color(0xFF6AAB64),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -448,7 +461,9 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 child: ElevatedButton(
                   onPressed: _fetchGardePharmacies,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isGardeActive ? const Color(0xFF6AAB64) : Colors.grey.shade400,
+                    backgroundColor: _isGardeActive
+                        ? const Color(0xFF6AAB64)
+                        : Colors.grey.shade400,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -477,7 +492,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                           ),
                           children: [
                             TileLayer(
-                              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              urlTemplate:
+                                  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                               subdomains: const ['a', 'b', 'c'],
                             ),
                             MarkerLayer(
@@ -497,8 +513,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                     width: 80.0,
                                     height: 80.0,
                                     point: LatLng(
-                                      double.parse(pharmacy['latitude'].toString()),
-                                      double.parse(pharmacy['longitude'].toString()),
+                                      double.parse(
+                                          pharmacy['latitude'].toString()),
+                                      double.parse(
+                                          pharmacy['longitude'].toString()),
                                     ),
                                     child: GestureDetector(
                                       onTap: () {
@@ -508,11 +526,15 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                             title: Text(pharmacy['nom']),
                                             content: Column(
                                               mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                Text('Emplacement: ${pharmacy['emplacement']}'),
-                                                Text('Téléphone: ${pharmacy['telephone1']}'),
-                                                Text('Distance: ${pharmacy['distance'].toStringAsFixed(2)} km'),
+                                                Text(
+                                                    'Emplacement: ${pharmacy['emplacement']}'),
+                                                Text(
+                                                    'Téléphone: ${pharmacy['telephone1']}'),
+                                                Text(
+                                                    'Distance: ${pharmacy['distance'].toStringAsFixed(2)} km'),
                                               ],
                                             ),
                                             actions: [
@@ -520,14 +542,19 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                                 onPressed: () async {
                                                   Navigator.of(context).pop();
                                                   await _fetchRoute(LatLng(
-                                                    double.parse(pharmacy['latitude'].toString()),
-                                                    double.parse(pharmacy['longitude'].toString()),
+                                                    double.parse(
+                                                        pharmacy['latitude']
+                                                            .toString()),
+                                                    double.parse(
+                                                        pharmacy['longitude']
+                                                            .toString()),
                                                   ));
                                                 },
                                                 child: const Text('Itinéraire'),
                                               ),
                                               TextButton(
-                                                onPressed: () => Navigator.of(context).pop(),
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
                                                 child: const Text('Fermer'),
                                               ),
                                             ],

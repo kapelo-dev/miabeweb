@@ -49,6 +49,9 @@ dependencies:
   latlong2: ^0.9.1
   location: ^8.0.0
   flutter_map: ^7.0.2
+  provider: ^6.1.1  # Pour la gestion d'état
+  font_awesome_flutter: ^10.7.0  # Pour les icônes Font Awesome
+  url_launcher: ^6.2.4  # Pour lancer les URLs
 
 dev_dependencies:
   flutter_test:

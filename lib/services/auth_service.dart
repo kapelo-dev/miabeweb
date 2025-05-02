@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user.dart' as app_models;
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -14,7 +15,8 @@ class AuthService {
 
   AuthService(this._prefs);
 
-  Future<bool> isUserLoggedIn() async => _prefs.getBool('isAuthenticated') ?? false;
+  Future<bool> isUserLoggedIn() async =>
+      _prefs.getBool('isAuthenticated') ?? false;
 
   Future<String?> getUserId() async => _prefs.getString('userId');
 
@@ -35,9 +37,10 @@ class AuthService {
     try {
       // Normalisation de l'email
       final normalizedEmail = email.trim().toLowerCase();
-      
-      final doc = await _firestore.collection('utilisateur').doc(normalizedEmail).get();
-      
+
+      final doc =
+          await _firestore.collection('utilisateur').doc(normalizedEmail).get();
+
       if (!doc.exists) {
         onError('Aucun utilisateur trouvé avec cet email');
         return;
@@ -45,7 +48,7 @@ class AuthService {
 
       final data = doc.data()!;
       final storedPassword = data['password'] as String?;
-      
+
       if (storedPassword == null || storedPassword.isEmpty) {
         onError('Compte invalide - mot de passe non défini');
         return;
@@ -72,12 +75,13 @@ class AuthService {
   }) async {
     try {
       // Normalisation du numéro de téléphone avec le préfixe +228
-      final normalizedPhone = phoneNumber.startsWith('+228') 
-          ? phoneNumber.trim() 
+      final normalizedPhone = phoneNumber.startsWith('+228')
+          ? phoneNumber.trim()
           : '+228${phoneNumber.trim()}';
-      
-      final doc = await _firestore.collection('utilisateur').doc(normalizedPhone).get();
-      
+
+      final doc =
+          await _firestore.collection('utilisateur').doc(normalizedPhone).get();
+
       if (!doc.exists) {
         onError('Aucun utilisateur trouvé avec ce numéro');
         return;
@@ -85,7 +89,7 @@ class AuthService {
 
       final data = doc.data()!;
       final storedPassword = data['password'] as String?;
-      
+
       if (storedPassword == null || storedPassword.isEmpty) {
         onError('Compte invalide - mot de passe non défini');
         return;
@@ -109,16 +113,19 @@ class AuthService {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return false;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       final user = userCredential.user!;
 
-      final doc = await _firestore.collection('utilisateur').doc(user.email).get();
+      final doc =
+          await _firestore.collection('utilisateur').doc(user.email).get();
       if (!doc.exists) {
         throw 'Utilisateur non trouvé dans la base de données';
       }
@@ -141,11 +148,16 @@ class AuthService {
   }) async {
     try {
       String userId = email ?? phoneNumber!;
-      final normalizedUserId = email != null 
-          ? email.trim().toLowerCase() 
-          : (phoneNumber!.startsWith('+228') ? phoneNumber.trim() : '+228${phoneNumber.trim()}');
-      
-      final doc = await _firestore.collection('utilisateur').doc(normalizedUserId).get();
+      final normalizedUserId = email != null
+          ? email.trim().toLowerCase()
+          : (phoneNumber!.startsWith('+228')
+              ? phoneNumber.trim()
+              : '+228${phoneNumber.trim()}');
+
+      final doc = await _firestore
+          .collection('utilisateur')
+          .doc(normalizedUserId)
+          .get();
       if (doc.exists) {
         onError('Utilisateur déjà existant');
         return;
@@ -174,16 +186,19 @@ class AuthService {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return false;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
       final user = userCredential.user!;
 
-      final doc = await _firestore.collection('utilisateur').doc(user.email).get();
+      final doc =
+          await _firestore.collection('utilisateur').doc(user.email).get();
       if (!doc.exists) {
         await _firestore.collection('utilisateur').doc(user.email).set({
           'email': user.email,
@@ -219,12 +234,13 @@ class AuthService {
       }
 
       if (storedOtp == code.trim()) {
-        final doc = await _firestore.collection('utilisateur').doc(tempUserId).get();
+        final doc =
+            await _firestore.collection('utilisateur').doc(tempUserId).get();
         if (!doc.exists) {
           print('Utilisateur non trouvé pour tempUserId: $tempUserId');
           return false;
         }
-        
+
         await _prefs.setBool('isAuthenticated', true);
         await _prefs.setString('userId', tempUserId);
         await _prefs.remove('tempOtp');
@@ -232,7 +248,7 @@ class AuthService {
         print('Vérification OTP réussie');
         return true;
       }
-      
+
       print('Échec : OTP incorrect');
       return false;
     } catch (e) {
@@ -245,5 +261,60 @@ class AuthService {
     await _googleSignIn.signOut();
     await _auth.signOut();
     await _prefs.clear();
+  }
+
+  Future<app_models.User?> getCurrentUser(String userId) async {
+    try {
+      final doc = await _firestore.collection('utilisateur').doc(userId).get();
+      if (doc.exists) {
+        return app_models.User.fromMap(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      print('Erreur lors de la récupération de l\'utilisateur: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateUser({
+    required String userId,
+    required String nom,
+    required String email,
+    required String telephone,
+    required String adresse,
+    String? oldPassword,
+    String? password,
+  }) async {
+    try {
+      final userRef = _firestore.collection('utilisateur').doc(userId);
+      final userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        return false;
+      }
+
+      final userData = userDoc.data()!;
+
+      // Vérifier l'ancien mot de passe si un nouveau est fourni
+      if (password != null && password.isNotEmpty) {
+        if (_hashPassword(oldPassword ?? '') != userData['password']) {
+          return false;
+        }
+      }
+
+      await userRef.update({
+        'nom_prenom': nom,
+        'email': email,
+        'telephone': telephone,
+        'adresse': adresse,
+        if (password != null && password.isNotEmpty)
+          'password': _hashPassword(password),
+      });
+
+      return true;
+    } catch (e) {
+      print('Erreur lors de la mise à jour de l\'utilisateur: $e');
+      return false;
+    }
   }
 }

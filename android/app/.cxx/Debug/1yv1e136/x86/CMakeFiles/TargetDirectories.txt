@@ -1,0 +1,2 @@
+C:/Users/Ezekiel/Desktop/miabePharmacie/android/app/.cxx/Debug/1yv1e136/x86/CMakeFiles/edit_cache.dir
+C:/Users/Ezekiel/Desktop/miabePharmacie/android/app/.cxx/Debug/1yv1e136/x86/CMakeFiles/rebuild_cache.dir

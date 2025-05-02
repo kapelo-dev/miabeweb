@@ -1,0 +1,2 @@
+C:/Users/Ezekiel/Desktop/miabePharmacie/android/app/.cxx/Debug/1yv1e136/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Ezekiel/Desktop/miabePharmacie/android/app/.cxx/Debug/1yv1e136/armeabi-v7a/CMakeFiles/rebuild_cache.dir
