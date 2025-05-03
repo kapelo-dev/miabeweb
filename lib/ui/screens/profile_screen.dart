@@ -7,6 +7,7 @@ import 'help_screen.dart';
 import '../../constants/colors.dart';
 import '../../viewmodels/edit_profile_viewmodel.dart';
 import '../../services/auth_service.dart';
+import '../../viewmodels/auth_view_model.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -14,6 +15,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Get.find<AuthService>();
+    final authViewModel = Get.find<AuthViewModel>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -157,6 +159,78 @@ class ProfileScreen extends StatelessWidget {
               );
             },
           ),
+          const Divider(thickness: 1),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Déconnexion'),
+                    content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Annuler',
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.pop(context); // Ferme la boîte de dialogue
+                          try {
+                            await authViewModel.signOut(); // Utilise le ViewModel pour la déconnexion qui gère déjà la navigation
+                            // Affiche un message de confirmation
+                            Get.snackbar(
+                              'Succès',
+                              'Vous avez été déconnecté avec succès',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.green.withOpacity(0.1),
+                              colorText: Colors.green,
+                              duration: const Duration(seconds: 3),
+                            );
+                          } catch (e) {
+                            // En cas d'erreur, affiche un message d'erreur
+                            Get.snackbar(
+                              'Erreur',
+                              'Erreur lors de la déconnexion: $e',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red.withOpacity(0.1),
+                              colorText: Colors.red,
+                            );
+                          }
+                        },
+                        child: const Text('Déconnexion',
+                          style: TextStyle(color: AppColors.error),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.logout, size: 24),
+                  SizedBox(width: 8),
+                  Text('Déconnexion',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );

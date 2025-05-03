@@ -143,8 +143,17 @@ class AuthViewModel extends GetxController {
   }
 
   Future<void> signOut() async {
-    await _authService.signOut();
-    _isOtpSent.value = false;
-    Get.offAllNamed('/screen_option');
+    try {
+      isLoading.value = true;
+      await _authService.signOut();
+      _isOtpSent.value = false;
+      error.value = '';
+      isLoading.value = false;
+      Get.offAllNamed('/screen_option');
+    } catch (e) {
+      isLoading.value = false;
+      error.value = e.toString();
+      throw 'Erreur lors de la déconnexion: $e';
+    }
   }
 }

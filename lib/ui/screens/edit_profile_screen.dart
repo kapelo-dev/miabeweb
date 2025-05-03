@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/edit_profile_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'change_password_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -16,12 +17,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _emailController = TextEditingController();
   final _telephoneController = TextEditingController();
   final _adresseController = TextEditingController();
-  final _oldPasswordController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  bool _showOldPassword = false;
-  bool _showPassword = false;
-  bool _showConfirmPassword = false;
+  bool _showPasswordFields = false;
 
   @override
   void initState() {
@@ -42,9 +38,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController.dispose();
     _telephoneController.dispose();
     _adresseController.dispose();
-    _oldPasswordController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -139,90 +132,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _oldPasswordController,
-                    obscureText: !_showOldPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Ancien mot de passe',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _showOldPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _showOldPassword = !_showOldPassword;
-                          });
-                        },
-                      ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6AAB64),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    validator: (value) {
-                      if (_passwordController.text.isNotEmpty &&
-                          (value == null || value.isEmpty)) {
-                        return 'Veuillez entrer votre ancien mot de passe';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: !_showPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Nouveau mot de passe (optionnel)',
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _showPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChangePasswordScreen(),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _showPassword = !_showPassword;
-                          });
-                        },
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value != null &&
-                          value.isNotEmpty &&
-                          value.length < 6) {
-                        return 'Le mot de passe doit contenir au moins 6 caractères';
-                      }
-                      return null;
+                      );
                     },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: !_showConfirmPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Confirmer le nouveau mot de passe',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _showConfirmPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _showConfirmPassword = !_showConfirmPassword;
-                          });
-                        },
-                      ),
-                    ),
-                    validator: (value) {
-                      if (_passwordController.text.isNotEmpty &&
-                          value != _passwordController.text) {
-                        return 'Les mots de passe ne correspondent pas';
-                      }
-                      return null;
-                    },
+                    child: const Text('Modifier le mot de passe'),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
@@ -262,10 +187,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               email: _emailController.text,
                               telephone: _telephoneController.text,
                               adresse: _adresseController.text,
-                              oldPassword: _oldPasswordController.text,
-                              password: _passwordController.text.isNotEmpty
-                                  ? _passwordController.text
-                                  : null,
+                              oldPassword: '',
+                              password: null,
                             );
 
                             if (success && mounted) {
