@@ -1,35 +1,76 @@
 import '../models/commande_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../constants/firebase_constants.dart';
 
 class CommandeService {
-  Future<List<CommandeModel>> getCommandesForUser(String userId) async {
-    // Simuler un délai réseau
-    await Future.delayed(const Duration(seconds: 1));
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-    // TODO: Remplacer par un vrai appel API
-    return [
-      CommandeModel(
-        code_commande: 'CMD001',
-        date: '2024-04-07',
-        pharmacieNom: 'Pharmacie Centrale',
-        pharmacieAdresse: '123 Rue du Commerce, Lomé',
-        items: [
-          CommandeItem(
-            nom: 'Paracétamol',
-            description: '500mg',
-            quantite: 2,
-            prix: 1500.0,
-          ),
-          CommandeItem(
-            nom: 'Vitamine C',
-            description: '1000mg, 30 comprimés',
-            quantite: 1,
-            prix: 3500.0,
-          ),
-        ],
-        total: '6500 FCFA',
-        heureRetrait: '15:30',
-        status: 'en attente',
-      ),
-    ];
+  Future<List<CommandeModel>> getCommandesForUser(String userId) async {
+    try {
+      List<CommandeModel> userCommandes = [];
+
+      // Obtenir toutes les pharmacies
+      final pharmaciesSnapshot = await _firestore
+          .collection(FirebaseConstants.pharmaciesCollection)
+          .get();
+
+      // Pour chaque pharmacie, chercher les commandes de l'utilisateur
+      for (var pharmacie in pharmaciesSnapshot.docs) {
+        final commandesSnapshot = await pharmacie.reference
+            .collection(FirebaseConstants.ordersCollection)
+            .where(FirebaseConstants.userIdField, isEqualTo: userId)
+            .get();
+
+        for (var commandeDoc in commandesSnapshot.docs) {
+          final commandeData = commandeDoc.data();
+          
+          // Convertir les items de la commande
+          List<CommandeItem> items = [];
+          num montantTotal = 0;
+          
+          for (var produit in (commandeData[FirebaseConstants.orderProductsField] as List)) {
+            final produitRef = await pharmacie.reference
+                .collection(FirebaseConstants.productsCollection)
+                .doc(produit[FirebaseConstants.productNameField])
+                .get();
+                
+            if (produitRef.exists) {
+              final produitData = produitRef.data()!;
+              final prixReel = produitData[FirebaseConstants.productPriceField] as num;
+              final quantite = produit[FirebaseConstants.productQuantityField] as num;
+              
+              items.add(
+                CommandeItem(
+                  nom: produit[FirebaseConstants.productNameField],
+                  description: produitData[FirebaseConstants.productDescriptionField] ?? '',
+                  quantite: quantite.toInt(),
+                  prix: prixReel.toDouble(),
+                ),
+              );
+              
+              montantTotal += prixReel * quantite;
+            }
+          }
+          
+          userCommandes.add(
+            CommandeModel(
+              code_commande: commandeData[FirebaseConstants.orderCodeField] ?? '',
+              date: commandeData[FirebaseConstants.orderDateField].toString().split(' ')[0],
+              pharmacieNom: pharmacie.get(FirebaseConstants.pharmacyNameField),
+              pharmacieAdresse: pharmacie.get(FirebaseConstants.pharmacyAddressField) ?? '',
+              items: items,
+              total: '$montantTotal FCFA',
+              heureRetrait: commandeData['heure_retrait'] ?? '',
+              status: commandeData[FirebaseConstants.orderStatusField] ?? 'en attente',
+            ),
+          );
+        }
+      }
+      
+      return userCommandes;
+    } catch (e) {
+      print('Erreur lors de la récupération des commandes: $e');
+      throw Exception('Impossible de récupérer les commandes: $e');
+    }
   }
 }

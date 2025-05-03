@@ -69,24 +69,41 @@ class HistoryViewModel extends ChangeNotifier {
     }
   }
 
+  Future<String> getConnectedUserId() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+      final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
+
+      if (!isAuthenticated || userId == null || userId.isEmpty) {
+        throw Exception('Aucun utilisateur connecté');
+      }
+
+      return userId;
+    } catch (e) {
+      throw Exception(
+          'Erreur lors de la récupération de l\'ID utilisateur: $e');
+    }
+  }
+
   Future<void> loadOrders() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final userName = await getConnectedUserName();
-      if (userName.isEmpty) {
-        throw Exception('Nom d\'utilisateur non trouvé');
+      final userId = await getConnectedUserId();
+      if (userId.isEmpty) {
+        throw Exception('ID utilisateur non trouvé');
       }
 
-      print('Chargement des commandes pour: $userName');
-      _orders = await _orderService.getOrders(userName);
+      print('Chargement des commandes pour l\'utilisateur ID: $userId');
+      _orders = await _orderService.getOrders(userId);
 
       if (_orders.isEmpty) {
-        print('Aucune commande trouvée pour: $userName');
+        print('Aucune commande trouvée pour l\'utilisateur ID: $userId');
       } else {
-        print('${_orders.length} commandes trouvées pour: $userName');
+        print('${_orders.length} commandes trouvées pour l\'utilisateur ID: $userId');
       }
 
       _error = null;

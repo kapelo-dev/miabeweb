@@ -32,24 +32,8 @@ class CommandeViewModel extends GetxController {
         return;
       }
 
-      // Récupérer le document utilisateur
-      final userDoc =
-          await _firestore.collection('utilisateur').doc(userId).get();
-
-      if (!userDoc.exists) {
-        print('Document utilisateur non trouvé');
-        return;
-      }
-
-      final userData = userDoc.data() as Map<String, dynamic>;
-      final userName = userData['nom_prenom'] as String;
-
-      // Nettoyer le nom d'utilisateur
-      final cleanedUserName = userName.trim();
-
-      // Récupérer les commandes en utilisant le repository
-      final allCommandes =
-          await _repository.getCommandesForUser(cleanedUserName);
+      // Récupérer les commandes en utilisant le repository et l'ID de l'utilisateur
+      final allCommandes = await _repository.getCommandesForUser(userId);
 
       // Filtrer les commandes pour ne garder que celles avec les statuts autorisés
       final filteredCommandes = allCommandes

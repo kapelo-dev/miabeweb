@@ -5,7 +5,7 @@ import '../constants/firebase_constants.dart';
 class OrderService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<app_models.Order>> getOrders(String userName) async {
+  Future<List<app_models.Order>> getOrders(String userId) async {
     try {
       List<app_models.Order> allOrders = [];
 
@@ -18,7 +18,7 @@ class OrderService {
       for (var pharmacie in pharmaciesSnapshot.docs) {
         final commandesSnapshot = await pharmacie.reference
             .collection(FirebaseConstants.ordersCollection)
-            .where(FirebaseConstants.orderUserField, isEqualTo: userName)
+            .where(FirebaseConstants.userIdField, isEqualTo: userId)
             .get();
 
         for (var commandeDoc in commandesSnapshot.docs) {

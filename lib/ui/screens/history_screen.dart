@@ -33,10 +33,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
 
     try {
-      final viewModel = context.read<HistoryViewModel>();
-      final username = await viewModel.getConnectedUserName();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
       
-      if (username.isEmpty) {
+      if (userId == null || userId.isEmpty) {
         throw Exception('Aucun utilisateur connecté');
       }
 
@@ -51,10 +51,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
           final pharmacyName = pharmacyData['nom'] ?? 'Inconnu';
           final pharmacyAddress = pharmacyData['emplacement'] ?? 'Adresse inconnue';
 
-          // Récupérer les commandes de l'utilisateur
+          // Récupérer les commandes de l'utilisateur avec l'ID utilisateur
           final commandesSnapshot = await pharmacyDoc.reference
               .collection('commandes')
-              .where('utilisateur', isEqualTo: username)
+              .where('utilisateur', isEqualTo: userId)
               .get();
 
           // Traiter chaque commande
@@ -92,7 +92,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 pharmacie: pharmacyName,
                 adresse: pharmacyAddress,
                 total: total,
-                utilisateur: username,
+                utilisateur: userId,
               );
 
               allOrders.add(order);
@@ -130,113 +130,116 @@ class _HistoryScreenState extends State<HistoryScreen> {
         backgroundColor: const Color(0xFF6AAB64),
         foregroundColor: Colors.white,
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFF6AAB64),
-              ),
-            )
-          : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Color(0xFF6AAB64),
-                        size: 48,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Exception: Impossible de récupérer les commandes',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+      body: Container(
+        color: const Color(0xFFF5F5F5),
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF6AAB64),
+                ),
+              )
+            : _error != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Color(0xFF6AAB64),
+                          size: 48,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        margin: const EdgeInsets.symmetric(horizontal: 24),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          _error!,
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Exception: Impossible de récupérer les commandes',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade800,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => _loadOrders(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6AAB64),
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Réessayer'),
-                      ),
-                    ],
-                  ),
-                )
-              : _orders.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.shopping_basket,
-                            color: Color(0xFF6AAB64),
-                            size: 72,
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.symmetric(horizontal: 24),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Aucune commande trouvée',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF6AAB64),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _error != null
-                                ? _error!
-                                : 'Vous n\'avez pas encore de commandes',
+                          child: Text(
+                            _error!,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade800,
                             ),
                           ),
-                          const SizedBox(height: 24),
-                          ElevatedButton.icon(
-                            onPressed: () => Get.toNamed('/home'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6AAB64),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
-                            ),
-                            icon: const Icon(Icons.shopping_cart),
-                            label: const Text('Passer une commande'),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => _loadOrders(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6AAB64),
+                            foregroundColor: Colors.white,
                           ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: _orders.length,
-                      padding: const EdgeInsets.all(16),
-                      itemBuilder: (context, index) {
-                        final order = _orders[index];
-                        return _buildOrderCard(order);
-                      },
+                          child: const Text('Réessayer'),
+                        ),
+                      ],
                     ),
+                  )
+                : _orders.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.shopping_basket,
+                              color: Color(0xFF6AAB64),
+                              size: 72,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Aucune commande trouvée',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF6AAB64),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _error != null
+                                  ? _error!
+                                  : 'Vous n\'avez pas encore de commandes',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () => Get.toNamed('/home'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF6AAB64),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                              ),
+                              icon: const Icon(Icons.shopping_cart),
+                              label: const Text('Passer une commande'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _orders.length,
+                        padding: const EdgeInsets.all(16),
+                        itemBuilder: (context, index) {
+                          final order = _orders[index];
+                          return _buildOrderCard(order);
+                        },
+                      ),
+      ),
     );
   }
 
@@ -300,214 +303,253 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildOrderCard(app_models.Order order) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-      ),
-      elevation: 0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Liste des produits
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xFFECF4EC),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...order.produits
-                    .map((produit) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      produit.nom.toUpperCase(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${_formatPrice(produit.prixUnitaire)} FCFA × ${produit.quantite}',
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    if (produit.surOrdonnance)
-                                      Row(
-                                        children: const [
-                                          Icon(
-                                            Icons.medical_services_outlined,
-                                            size: 14,
-                                            color: Colors.red,
-                                          ),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            'Sur ordonnance',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              Text(
-                                '${_formatPrice(produit.prixUnitaire * produit.quantite)} FCFA',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ))
-                    .toList(),
-                const Divider(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Total',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      '${_formatPrice(order.total)} FCFA',
-                      style: const TextStyle(
-                        color: Color(0xFF6AAB64),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-                if (order.statusCommande.toLowerCase() == 'récupérée' ||
-                    order.statusCommande.toLowerCase() == 'validé')
-                  TextButton(
-                    onPressed: () {
-                      _showOrderDetails(context, order);
-                    },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      alignment: Alignment.centerRight,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Voir plus',
-                      style: TextStyle(
-                        color: Color(0xFF6AAB64),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
-          // Informations de la commande
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
+        ],
+      ),
+      child: Card(
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Informations de la commande et de la pharmacie
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
               ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Commande ${order.codeCommande}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(order.statusCommande)
-                            .withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        order.statusCommande,
-                        style: TextStyle(
-                          color: _getStatusColor(order.statusCommande),
-                          fontSize: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Commande ${order.codeCommande}',
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _formatDate(order.dateCommande),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  order.pharmacie,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                if (order.adresse.isNotEmpty)
-                  Text(
-                    order.adresse,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                if (order.statusCommande.toLowerCase() == 'récupérée' ||
-                    order.statusCommande.toLowerCase() == 'validé')
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.access_time,
-                            size: 16, color: Color(0xFF6AAB64)),
-                        const SizedBox(width: 4),
-                        Text(
-                          'À retirer à ${_getPickupTime(order.dateCommande)}',
-                          style: const TextStyle(
-                            color: Color(0xFF6AAB64),
-                            fontWeight: FontWeight.w500,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(order.statusCommande)
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          order.statusCommande,
+                          style: TextStyle(
+                            color: _getStatusColor(order.statusCommande),
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatDate(order.dateCommande),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 13,
                     ),
                   ),
-              ],
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.local_pharmacy_outlined, 
+                        size: 16, 
+                        color: Color(0xFF6AAB64)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              order.pharmacie,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            if (order.adresse.isNotEmpty)
+                              Text(
+                                order.adresse,
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (order.statusCommande.toLowerCase() == 'récupérée' ||
+                      order.statusCommande.toLowerCase() == 'validé')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.access_time,
+                              size: 16, color: Color(0xFF6AAB64)),
+                          const SizedBox(width: 4),
+                          Text(
+                            'À retirer à ${_getPickupTime(order.dateCommande)}',
+                            style: const TextStyle(
+                              color: Color(0xFF6AAB64),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+            // Liste des produits
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color(0xFFECF4EC),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Produits',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF6AAB64),
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ...order.produits
+                      .map((produit) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        produit.nom.toUpperCase(),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${_formatPrice(produit.prixUnitaire)} FCFA × ${produit.quantite}',
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      if (produit.surOrdonnance)
+                                        Row(
+                                          children: const [
+                                            Icon(
+                                              Icons.medical_services_outlined,
+                                              size: 14,
+                                              color: Colors.red,
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'Sur ordonnance',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  '${_formatPrice(produit.prixUnitaire * produit.quantite)} FCFA',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ))
+                      .toList(),
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${_formatPrice(order.total)} FCFA',
+                        style: const TextStyle(
+                          color: Color(0xFF6AAB64),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (order.statusCommande.toLowerCase() == 'récupérée' ||
+                      order.statusCommande.toLowerCase() == 'validé')
+                    TextButton(
+                      onPressed: () {
+                        _showOrderDetails(context, order);
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        alignment: Alignment.centerRight,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: const Text(
+                        'Voir plus',
+                        style: TextStyle(
+                          color: Color(0xFF6AAB64),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
