@@ -41,24 +41,72 @@ class ChatViewModel extends GetxController {
   }
 
   bool _detectOrderIntent(String message) {
-    final keywords = [
+    final orderKeywords = [
       'commander',
       'acheter',
       'passer une commande',
       'faire une commande',
-      'médicament',
-      'produit',
-      'pharmacie',
+      'je veux commander',
+      'je souhaite commander',
+      'je voudrais commander',
+      'ajouter au panier',
     ];
 
     message = message.toLowerCase();
-    return keywords.any((keyword) => message.contains(keyword.toLowerCase()));
+    // Vérifier si le message contient une intention claire de commande
+    bool hasOrderIntent = orderKeywords.any((keyword) => message.contains(keyword.toLowerCase()));
+    
+    // Éviter les faux positifs pour les questions d'information
+    final informationKeywords = [
+      'où',
+      'où est',
+      'où sont',
+      'quelles sont',
+      'quelle est',
+      'proche',
+      'proches',
+      'proximité',
+      'près',
+      'près de',
+      'autour',
+      'autour de',
+      'disponible',
+      'disponibles',
+      'horaires',
+      'ouvert',
+      'ouverte',
+      'fermé',
+      'fermée',
+      'information',
+      'renseignement',
+      'cherche',
+      'trouve',
+      'trouver',
+      'localiser',
+      'connaître',
+      'savoir',
+    ];
+
+    bool isInformationRequest = informationKeywords.any((keyword) => message.contains(keyword.toLowerCase()));
+
+    // Si c'est clairement une demande d'information, ne pas considérer comme une intention de commande
+    if (isInformationRequest && !hasOrderIntent) {
+      return false;
+    }
+
+    // Pour les messages contenant "médicament" ou "produit", vérifier le contexte
+    if (message.contains('médicament') || message.contains('produit')) {
+      // Ne considérer comme intention de commande que si accompagné d'un mot clé de commande
+      return hasOrderIntent;
+    }
+
+    return hasOrderIntent;
   }
 
   void _handleOrderIntent() {
     messages.add(
       Message(
-        text: "Voulez-vous passer une commande ? Répondez par 'oui' ou 'non'.",
+        text: "Souhaitez-vous passer une commande de médicaments ? Je peux vous aider à commander auprès d'une pharmacie. Répondez par 'oui' pour commencer la commande ou 'non' pour continuer la discussion.",
         isUser: false,
         timestamp: DateTime.now(),
       ),
@@ -182,7 +230,7 @@ class ChatViewModel extends GetxController {
         } else if (userMessage.toLowerCase() == 'non') {
           messages.add(
             Message(
-              text: "D'accord, comment puis-je vous aider autrement ?",
+              text: "D'accord, je reste à votre disposition pour vous renseigner. Comment puis-je vous aider ?",
               isUser: false,
               timestamp: DateTime.now(),
             ),
@@ -191,7 +239,7 @@ class ChatViewModel extends GetxController {
         } else {
           messages.add(
             Message(
-              text: "Je n'ai pas compris votre réponse. Veuillez répondre par 'oui' ou 'non'.",
+              text: "Je n'ai pas bien compris votre réponse. Veuillez répondre par 'oui' si vous souhaitez passer une commande, ou 'non' si vous voulez simplement des informations.",
               isUser: false,
               timestamp: DateTime.now(),
             ),
@@ -219,7 +267,7 @@ class ChatViewModel extends GetxController {
     } catch (e) {
       messages.add(
         Message(
-          text: "Désolé, une erreur s'est produite. Veuillez réessayer.",
+          text: "Je suis désolé, j'ai rencontré une erreur. Pouvez-vous reformuler votre demande ?",
           isUser: false,
           timestamp: DateTime.now(),
         ),

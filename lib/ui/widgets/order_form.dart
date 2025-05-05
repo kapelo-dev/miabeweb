@@ -105,6 +105,9 @@ class _OrderFormState extends State<OrderForm> {
           'quantite': 1,
         });
       }
+      
+      // Vider la barre de recherche
+      _searchController.clear();
     });
   }
 
@@ -131,6 +134,97 @@ class _OrderFormState extends State<OrderForm> {
       final prix = product['prix_unitaire'] ?? product['prix'] ?? 0;
       return sum + (prix * (product['quantite'] ?? 1));
     });
+  }
+
+  Future<void> _showConfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmation de commande'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pharmacie: ${widget.selectedPharmacy['nom']}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                const Text('Produits commandés:'),
+                const SizedBox(height: 8),
+                ...List.generate(_selectedProducts.length, (index) {
+                  final product = _selectedProducts[index];
+                  final prix = product['prix_unitaire'] ?? product['prix'] ?? 0;
+                  final quantite = product['quantite'] ?? 1;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${product['nom']} x$quantite',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                        Text(
+                          '${(prix * quantite).toStringAsFixed(0)} FCFA',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Total:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      '${_totalAmount.toStringAsFixed(0)} FCFA',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Annuler',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                widget.onOrderSubmit(_selectedProducts);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6AAB64),
+              ),
+              child: const Text(
+                'Confirmer',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -274,7 +368,7 @@ class _OrderFormState extends State<OrderForm> {
 
             // Bouton de commande
             ElevatedButton(
-              onPressed: () => widget.onOrderSubmit(_selectedProducts),
+              onPressed: _showConfirmationDialog,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6AAB64),
                 padding: const EdgeInsets.symmetric(vertical: 16),
