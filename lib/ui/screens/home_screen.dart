@@ -100,7 +100,7 @@ class HomeScreenContent extends StatefulWidget {
   _HomeScreenContentState createState() => _HomeScreenContentState();
 }
 
-class _HomeScreenContentState extends State<HomeScreenContent> {
+class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindingObserver {
   final PharmacieService _pharmacieService = PharmacieService();
   late MapController _mapController;
   LatLng? _currentLocation;
@@ -108,58 +108,103 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
   List<LatLng> _route = [];
   bool _isLoading = true;
   bool _isGardeActive = false;
-  String? _errorMessage; // Pour stocker le message d'erreur
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _mapController = MapController();
-    _initializeLocation();
+    _startInitialization();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _startInitialization();
+    }
+  }
+
+  Future<void> _startInitialization() async {
+    try {
+      await _initializeLocation();
+    } catch (e) {
+      if (!mounted) return;
+      _showError('Erreur lors de l\'initialisation : $e');
+    }
   }
 
   Future<void> _initializeLocation() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission != LocationPermission.whileInUse &&
             permission != LocationPermission.always) {
-          _showError('Permission de localisation refusée.');
-          setState(() => _isLoading = false);
-          return;
+          throw Exception('Permission de localisation refusée');
         }
       }
 
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _showError('Veuillez activer le service de localisation.');
-        setState(() => _isLoading = false);
-        return;
+        throw Exception('Service de localisation désactivé');
       }
 
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high
+      );
+
+      if (!mounted) return;
+
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
-        _isLoading = false;
       });
+
       _mapController.move(_currentLocation!, 15.0);
+      
       await _fetchNearbyPharmacies();
+
     } catch (e) {
-      _showError('Erreur lors de la récupération de la localisation : $e');
-      setState(() => _isLoading = false);
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Erreur de localisation : $e';
+      });
+      _showError(_errorMessage!);
     }
   }
 
   Future<void> _fetchNearbyPharmacies() async {
-    if (_currentLocation == null) return;
+    if (_currentLocation == null) {
+      _showError('Position non disponible. Veuillez réessayer.');
+      setState(() => _isLoading = false);
+      return;
+    }
 
     setState(() {
       _isLoading = true;
       _isGardeActive = false;
-      _errorMessage = null; // Réinitialiser le message d'erreur
+      _errorMessage = null;
+      _route = [];
     });
+
     try {
+      print('Récupération des pharmacies proches...');
+      print('Position: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}');
+
       final pharmacies = await _pharmacieService.getPharmaciesProches(
         _currentLocation!.latitude,
         _currentLocation!.longitude,
@@ -167,24 +212,42 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
         limit: 10,
       );
 
-      // Filtrer les pharmacies ouvertes selon l'heure actuelle
+      if (!mounted) return;
+
+      print('Nombre de pharmacies reçues: ${pharmacies.length}');
+
       final filteredPharmacies = _filterOpenPharmacies(pharmacies);
+      print('Nombre de pharmacies ouvertes: ${filteredPharmacies.length}');
 
       setState(() {
         _nearbyPharmacies = filteredPharmacies;
-        _route = [];
         _isLoading = false;
         if (filteredPharmacies.isEmpty) {
-          _errorMessage = 'Aucune pharmacie ouverte à cette heure.';
+          _errorMessage = 'Aucune pharmacie ouverte trouvée dans votre zone.';
         }
       });
-      _fitMapToPharmacies();
+
+      if (filteredPharmacies.isNotEmpty) {
+        _fitMapToPharmacies();
+      } else {
+        _mapController.move(_currentLocation!, 15.0);
+      }
+
     } catch (e) {
+      print('Erreur lors de la récupération des pharmacies: $e');
+      if (!mounted) return;
+      
       setState(() {
         _isLoading = false;
-        _nearbyPharmacies = []; // Vider la liste des pharmacies
-        _errorMessage = 'Erreur lors de la récupération des pharmacies : $e';
+        _nearbyPharmacies = [];
+        _errorMessage = 'Erreur lors de la recherche des pharmacies : $e';
       });
+
+      _showError(_errorMessage!);
+      
+      if (_currentLocation != null) {
+        _mapController.move(_currentLocation!, 15.0);
+      }
     }
   }
 
@@ -194,7 +257,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     setState(() {
       _isLoading = true;
       _isGardeActive = true;
-      _errorMessage = null; // Réinitialiser le message d'erreur
+      _errorMessage = null;
     });
     try {
       final pharmacies = await _pharmacieService.getPharmaciesGardeProches(
@@ -215,7 +278,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _nearbyPharmacies = []; // Vider la liste des pharmacies
+        _nearbyPharmacies = [];
         _errorMessage =
             'Erreur lors de la récupération des pharmacies de garde : $e';
       });
@@ -231,7 +294,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     return pharmacies
         .where((pharmacy) {
           if (pharmacy['ouverture'] == null || pharmacy['fermeture'] == null) {
-            return false; // Exclure les pharmacies sans horaires
+            return false;
           }
 
           final openTime = _parseTime(pharmacy['ouverture']);
@@ -265,7 +328,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
   Future<void> _fetchRoute(LatLng destination) async {
     if (_currentLocation == null) return;
 
-    // Ajout de paramètres pour un itinéraire plus précis
     final url = Uri.parse('http://router.project-osrm.org/route/v1/driving/'
         '${_currentLocation!.longitude},${_currentLocation!.latitude};'
         '${destination.longitude},${destination.latitude}'
@@ -278,13 +340,11 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
           final route = data['routes'][0]['geometry'];
           final newRoute = _decodePolyline(route);
 
-          // Vérification de la validité des points
           if (newRoute.length < 2) {
             _showError('Itinéraire invalide : pas assez de points.');
             return;
           }
 
-          // Vérification des distances entre points pour éviter les sauts
           for (int i = 0; i < newRoute.length - 1; i++) {
             final distance = Geolocator.distanceBetween(
               newRoute[i].latitude,
@@ -293,7 +353,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
               newRoute[i + 1].longitude,
             );
             if (distance > 1000) {
-              // Si la distance entre deux points est > 1km, suspect
               _showError('Itinéraire invalide : points trop éloignés.');
               return;
             }
@@ -351,7 +410,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     if (_currentLocation == null) return;
 
     if (_nearbyPharmacies.isEmpty) {
-      // Si aucune pharmacie, centrer sur la position actuelle
       _mapController.move(_currentLocation!, 15.0);
       return;
     }
@@ -403,7 +461,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
           LatLng(maxLat, maxLon),
         ),
         padding: const EdgeInsets.all(
-            30), // Réduction du padding pour un zoom plus serré
+            30),
       ),
     );
   }

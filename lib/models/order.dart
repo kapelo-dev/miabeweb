@@ -9,10 +9,11 @@ class Order {
   final String codeCommande;
   final String pharmacie;
   final String adresse;
-  final String statusCommande;
+  final String? statusCommande;
   final double total;
   final DateTime dateCommande;
   final String utilisateur;
+  bool isHidden;
 
   Order({
     required this.id,
@@ -26,6 +27,7 @@ class Order {
     required this.total,
     required this.dateCommande,
     required this.utilisateur,
+    this.isHidden = false,
   });
 
   factory Order.fromMap(Map<String, dynamic> map) {
@@ -78,6 +80,7 @@ class Order {
       total: parsedTotal,
       dateCommande: parsedDate,
       utilisateur: map['utilisateur']?.toString() ?? '',
+      isHidden: map['is_hidden'] ?? false,
     );
   }
 
@@ -94,6 +97,7 @@ class Order {
       'montant_total': total,
       'date_commande': dateCommande,
       'utilisateur': utilisateur,
+      'is_hidden': isHidden,
     };
   }
 }

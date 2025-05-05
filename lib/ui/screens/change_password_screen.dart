@@ -56,10 +56,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             physics: const BouncingScrollPhysics(),
             child: Padding(
               padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 20),
                     Container(
@@ -77,33 +77,33 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Modification du mot de passe',
+                children: [
+                  const Text(
+                    'Modification du mot de passe',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          TextFormField(
-                            controller: _oldPasswordController,
+                  ),
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    controller: _oldPasswordController,
                             obscureText: _obscureOldPassword,
-                            decoration: InputDecoration(
-                              labelText: 'Ancien mot de passe',
+                    decoration: InputDecoration(
+                      labelText: 'Ancien mot de passe',
                               prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF6AAB64)),
-                              suffixIcon: IconButton(
-                                icon: Icon(
+                      suffixIcon: IconButton(
+                        icon: Icon(
                                   _obscureOldPassword ? Icons.visibility_off : Icons.visibility,
                                   color: Colors.grey,
-                                ),
-                                onPressed: () {
-                                  setState(() {
+                        ),
+                        onPressed: () {
+                          setState(() {
                                     _obscureOldPassword = !_obscureOldPassword;
-                                  });
-                                },
-                              ),
+                          });
+                        },
+                      ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -115,32 +115,32 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(color: Color(0xFF6AAB64)),
                               ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez entrer votre ancien mot de passe';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer votre ancien mot de passe';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
                             controller: _newPasswordController,
                             obscureText: _obscureNewPassword,
-                            decoration: InputDecoration(
-                              labelText: 'Nouveau mot de passe',
+                    decoration: InputDecoration(
+                      labelText: 'Nouveau mot de passe',
                               prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF6AAB64)),
-                              suffixIcon: IconButton(
-                                icon: Icon(
+                      suffixIcon: IconButton(
+                        icon: Icon(
                                   _obscureNewPassword ? Icons.visibility_off : Icons.visibility,
                                   color: Colors.grey,
-                                ),
-                                onPressed: () {
-                                  setState(() {
+                        ),
+                        onPressed: () {
+                          setState(() {
                                     _obscureNewPassword = !_obscureNewPassword;
-                                  });
-                                },
-                              ),
+                          });
+                        },
+                      ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -152,35 +152,35 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(color: Color(0xFF6AAB64)),
                               ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
                                 return 'Veuillez entrer votre nouveau mot de passe';
-                              }
-                              if (value.length < 6) {
-                                return 'Le mot de passe doit contenir au moins 6 caractères';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _confirmPasswordController,
+                      }
+                      if (value.length < 6) {
+                        return 'Le mot de passe doit contenir au moins 6 caractères';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _confirmPasswordController,
                             obscureText: _obscureConfirmPassword,
-                            decoration: InputDecoration(
-                              labelText: 'Confirmer le nouveau mot de passe',
+                    decoration: InputDecoration(
+                      labelText: 'Confirmer le nouveau mot de passe',
                               prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF6AAB64)),
-                              suffixIcon: IconButton(
-                                icon: Icon(
+                      suffixIcon: IconButton(
+                        icon: Icon(
                                   _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
                                   color: Colors.grey,
-                                ),
-                                onPressed: () {
-                                  setState(() {
+                        ),
+                        onPressed: () {
+                          setState(() {
                                     _obscureConfirmPassword = !_obscureConfirmPassword;
-                                  });
-                                },
-                              ),
+                          });
+                        },
+                      ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -192,22 +192,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(color: Color(0xFF6AAB64)),
                               ),
-                            ),
-                            validator: (value) {
+                    ),
+                    validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Veuillez confirmer votre nouveau mot de passe';
                               }
                               if (value != _newPasswordController.text) {
-                                return 'Les mots de passe ne correspondent pas';
-                              }
-                              return null;
-                            },
+                        return 'Les mots de passe ne correspondent pas';
+                      }
+                      return null;
+                    },
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
                       onPressed: _isLoading
                           ? null
                           : () async {
@@ -271,10 +271,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 }
                               }
                             },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6AAB64),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6AAB64),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

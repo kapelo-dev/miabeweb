@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:miabe_pharmacie/viewmodels/auth_view_model.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -11,15 +12,41 @@ class OtpScreen extends StatefulWidget {
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
   final TextEditingController otpController = TextEditingController();
   int countdown = 60;
   late Timer _timer;
+  String? appSignature;
+  bool _isAutofilling = false;
+
+  @override
+  void codeUpdated() {
+    if (mounted && !_isAutofilling) {
+      setState(() {
+        _isAutofilling = true;
+        otpController.text = code ?? '';
+      });
+      if (code != null && code!.length == 4) {
+        verifyOtp();
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     startCountdown();
+    _initSmsListener();
+  }
+
+  Future<void> _initSmsListener() async {
+    try {
+      appSignature = await SmsAutoFill().getAppSignature;
+      await SmsAutoFill().listenForCode();
+      print("Écoute des SMS démarrée...");
+    } catch (e) {
+      print("Erreur lors de l'initialisation de l'écoute SMS: $e");
+    }
   }
 
   void startCountdown() {
@@ -36,10 +63,16 @@ class _OtpScreenState extends State<OtpScreen> {
   void dispose() {
     _timer.cancel();
     otpController.dispose();
+    SmsAutoFill().unregisterListener();
+    cancel();
     super.dispose();
   }
 
   void verifyOtp() async {
+    if (_isAutofilling) {
+      setState(() => _isAutofilling = false);
+    }
+    
     final AuthViewModel authViewModel = Get.find();
     String verificationId = Get.arguments;
     bool isSuccess = await authViewModel.verifyOTP(verificationId, otpController.text);
@@ -75,17 +108,17 @@ class _OtpScreenState extends State<OtpScreen> {
                       tag: 'logo',
                       child: Image.asset('lib/assets/images/logo.png', height: 120),
                     ),
-            const SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     const Text(
                       'MIAWOÉ ZON',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
                       ),
                     ),
-            const SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     const Text(
                       'Vérification OTP',
                       style: TextStyle(
@@ -101,9 +134,9 @@ class _OtpScreenState extends State<OtpScreen> {
             Expanded(
               flex: 3,
               child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                   boxShadow: [
                     BoxShadow(
@@ -115,11 +148,11 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 padding: const EdgeInsets.all(20.0),
                 child: SingleChildScrollView(
-              child: Column(
-                children: [
+                  child: Column(
+                    children: [
                       const Text(
                         'Code de vérification',
-                      style: TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF6AAB64),
@@ -129,7 +162,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 30.0),
                         child: Text(
-                          'Nous vous avons envoyé un code de vérification. Veuillez le saisir ci-dessous.',
+                          'Nous vous avons envoyé un code de vérification. Il sera automatiquement détecté.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.grey,
@@ -211,14 +244,14 @@ class _OtpScreenState extends State<OtpScreen> {
                           },
                           child: const Text(
                             'Renvoyer le code',
-                        style: TextStyle(
+                            style: TextStyle(
                               color: Color(0xFF6AAB64),
-                          fontSize: 16,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

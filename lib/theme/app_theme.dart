@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static const Color primaryColor = Color(0xFF6AAB64);
-  static const Color secondaryColor = Color(0xFF4A8244);
-  static const Color backgroundColor = Color(0xFFF5F6FA);
-  static const Color textColor = Color(0xFF2D3142);
-  static const Color subtitleColor = Color(0xFF9BA3B2);
-  static const Color successColor = Color(0xFF34C759);
-  static const Color warningColor = Color(0xFFFBAF17);
-  static const Color errorColor = Color(0xFFFF3B30);
-  static const Color surfaceColor = Colors.white;
+  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color errorColor = Color(0xFFE53935);
+  static const Color warningColor = Color(0xFFFFA726);
+  static const Color successColor = Color(0xFF66BB6A);
+  static const Color textColor = Color(0xFF333333);
+  static const Color secondaryTextColor = Color(0xFF757575);
 
   // Tailles de police standardisées
   static const double fontSizeXSmall = 10;
@@ -19,108 +17,64 @@ class AppTheme {
   static const double fontSizeLarge = 18;
   static const double fontSizeXLarge = 20;
 
-  static ThemeData get lightTheme {
-    return ThemeData(
-      primaryColor: primaryColor,
-      scaffoldBackgroundColor: primaryColor,
-      colorScheme: ColorScheme.light(
-        primary: primaryColor,
-        secondary: secondaryColor,
-        surface: surfaceColor,
-        background: backgroundColor,
-        error: errorColor,
+  static ThemeData get lightTheme => ThemeData(
+    primaryColor: primaryColor,
+    scaffoldBackgroundColor: backgroundColor,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: primaryColor,
+      elevation: 0,
+      iconTheme: IconThemeData(color: Colors.white),
+      titleTextStyle: TextStyle(
+        color: Colors.white,
+        fontSize: fontSizeXLarge,
+        fontWeight: FontWeight.bold,
       ),
-      appBarTheme: AppBarTheme(
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
-        elevation: 0,
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: fontSizeMedium,
-          fontWeight: FontWeight.w600,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 12,
         ),
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
-      bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: primaryColor,
-          textStyle: TextStyle(
-            fontSize: fontSizeNormal,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+    ),
+    cardTheme: CardTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          minimumSize: Size(double.infinity, 48),
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          textStyle: TextStyle(
-            fontSize: fontSizeNormal,
-            fontWeight: FontWeight.w600,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 0,
-        ),
+      elevation: 2,
+    ),
+    textTheme: const TextTheme(
+      titleLarge: TextStyle(
+        fontSize: fontSizeXLarge,
+        fontWeight: FontWeight.bold,
+        color: textColor,
       ),
-      textTheme: TextTheme(
-        displayLarge: TextStyle(
-          color: textColor,
-          fontSize: fontSizeLarge,
-          fontWeight: FontWeight.bold,
-        ),
-        displayMedium: TextStyle(
-          color: textColor,
-          fontSize: fontSizeMedium,
-          fontWeight: FontWeight.bold,
-        ),
-        displaySmall: TextStyle(
-          color: textColor,
-          fontSize: fontSizeNormal,
-          fontWeight: FontWeight.bold,
-        ),
-        headlineMedium: TextStyle(
-          color: textColor,
-          fontSize: fontSizeMedium,
-          fontWeight: FontWeight.w600,
-        ),
-        titleLarge: TextStyle(
-          color: textColor,
-          fontSize: fontSizeMedium,
-          fontWeight: FontWeight.bold,
-        ),
-        titleMedium: TextStyle(
-          color: textColor,
-          fontSize: fontSizeNormal,
-          fontWeight: FontWeight.w600,
-        ),
-        titleSmall: TextStyle(
-          color: textColor,
-          fontSize: fontSizeSmall,
-          fontWeight: FontWeight.w600,
-        ),
-        bodyLarge: TextStyle(
-          color: textColor,
-          fontSize: fontSizeNormal,
-        ),
-        bodyMedium: TextStyle(
-          color: subtitleColor,
-          fontSize: fontSizeSmall,
-        ),
-        bodySmall: TextStyle(
-          color: subtitleColor,
-          fontSize: fontSizeXSmall,
-        ),
+      titleMedium: TextStyle(
+        fontSize: fontSizeMedium,
+        fontWeight: FontWeight.w600,
+        color: textColor,
       ),
-    );
-  }
+      bodyLarge: TextStyle(
+        fontSize: fontSizeMedium,
+        color: textColor,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: fontSizeNormal,
+        color: secondaryTextColor,
+      ),
+      bodySmall: TextStyle(
+        fontSize: fontSizeSmall,
+        color: secondaryTextColor,
+      ),
+    ),
+  );
+
+  // Pour la rétrocompatibilité
+  static ThemeData get theme => lightTheme;
 } 
