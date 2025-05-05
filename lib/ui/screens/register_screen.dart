@@ -1,31 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:miabe_pharmacie/viewmodels/auth_view_model.dart';
+import 'package:country_picker/country_picker.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
     final AuthViewModel authViewModel = Get.find();
     final TextEditingController nameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
     final TextEditingController phoneController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
     RxString method = 'email'.obs;
+  Country selectedCountry = Country(
+    phoneCode: "228",
+    countryCode: "TG",
+    e164Sc: 0,
+    geographic: true,
+    level: 1,
+    name: "Togo",
+    example: "90000000",
+    displayName: "Togo",
+    displayNameNoCountryCode: "TG",
+    e164Key: "",
+  );
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF6AAB64),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
-              child: Padding(
+              flex: 2,
+              child: Container(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 50),
-                    Image.asset('lib/assets/images/logo.png', height: 120),
+                    Hero(
+                      tag: 'logo',
+                      child: Image.asset('lib/assets/images/logo.png', height: 120),
+                    ),
                     const SizedBox(height: 20),
                     const Text(
                       'MIAWOÉ ZON',
@@ -33,132 +55,245 @@ class RegisterScreen extends StatelessWidget {
                         color: Colors.white,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
                       ),
                     ),
                     const SizedBox(height: 10),
                     const Text(
                       'Créez votre compte',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
             Expanded(
+              flex: 4,
               child: Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10,
+                      offset: Offset(0, -5),
+                    ),
+                  ],
                 ),
-                child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: SingleChildScrollView(
-                    child: Obx(
-                      () => Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // DropdownButtonFormField encadré en premier
-                          DropdownButtonFormField<String>(
-                            value: method.value,
-                            decoration: const InputDecoration(
-                              labelText: 'Méthode d\'inscription',
-                              labelStyle: TextStyle(color: Colors.black),
-                              border: OutlineInputBorder(),
+                      const Text(
+                        'Nom et prénom',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6AAB64),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: nameController,
+                        decoration: InputDecoration(
+                          hintText: "Entrez votre nom complet",
+                          prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF6AAB64)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Color(0xFF6AAB64)),
+                          ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFF6AAB64)),
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Color(0xFF6AAB64)),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFF6AAB64)),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                            items: const [
-                              DropdownMenuItem(value: 'email', child: Text('Email')),
-                              DropdownMenuItem(value: 'phone', child: Text('Téléphone')),
-                            ],
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Color(0xFF6AAB64), width: 2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Radio(
+                            value: 'email',
+                            groupValue: method.value,
                             onChanged: (value) => method.value = value!,
+                            activeColor: const Color(0xFF6AAB64),
+                          ),
+                          const Text('Email'),
+                          const SizedBox(width: 20),
+                          Radio(
+                            value: 'phone',
+                            groupValue: method.value,
+                            onChanged: (value) => method.value = value!,
+                            activeColor: const Color(0xFF6AAB64),
+                          ),
+                          const Text('Téléphone'),
+                        ],
                           ),
                           const SizedBox(height: 20),
-                          // Champ "Nom" en deuxième
-                          TextFormField(
-                            controller: nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nom',
-                              labelStyle: TextStyle(color: Colors.black),
-                              border: OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFF6AAB64)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFF6AAB64)),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          // Champ conditionnel "Email" ou "Téléphone"
-                          if (method.value == 'email')
+                      Obx(() => method.value == 'email'
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Adresse email',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF6AAB64),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
                             TextFormField(
                               controller: emailController,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                labelStyle: TextStyle(color: Colors.black),
-                                border: OutlineInputBorder(),
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: InputDecoration(
+                                    hintText: "Entrez votre email",
+                                    prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF6AAB64)),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: const BorderSide(color: Color(0xFF6AAB64)),
+                                    ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xFF6AAB64)),
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: const BorderSide(color: Color(0xFF6AAB64)),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: const BorderSide(color: Color(0xFF6AAB64), width: 2),
+                                    ),
+                                  ),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xFF6AAB64)),
+                              ],
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Numéro de téléphone',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF6AAB64),
+                                  ),
                                 ),
-                                filled: true,
-                                fillColor: Colors.white,
-                              ),
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                          if (method.value == 'phone')
-                            TextFormField(
+                                const SizedBox(height: 8),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: const Color(0xFF6AAB64)),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          showCountryPicker(
+                                            context: context,
+                                            countryListTheme: CountryListThemeData(
+                                              flagSize: 25,
+                                              backgroundColor: Colors.white,
+                                              textStyle: const TextStyle(fontSize: 16),
+                                              bottomSheetHeight: 500,
+                                              borderRadius: const BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                topRight: Radius.circular(20),
+                                              ),
+                                              inputDecoration: InputDecoration(
+                                                labelText: 'Rechercher',
+                                                prefixIcon: const Icon(Icons.search),
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(15),
+                                                ),
+                                              ),
+                                            ),
+                                            onSelect: (Country country) {
+                                              setState(() {
+                                                selectedCountry = country;
+                                              });
+                                            },
+                                          );
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              selectedCountry.flagEmoji,
+                                              style: const TextStyle(fontSize: 25),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              "+${selectedCountry.phoneCode}",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            const Icon(Icons.arrow_drop_down, color: Colors.black),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      const VerticalDivider(
+                                        color: Color(0xFF6AAB64),
+                                        thickness: 1,
+                                        indent: 8,
+                                        endIndent: 8,
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
                               controller: phoneController,
+                                          keyboardType: TextInputType.phone,
                               decoration: const InputDecoration(
-                                labelText: 'Numéro de téléphone',
-                                labelStyle: TextStyle(color: Colors.black),
-                                border: OutlineInputBorder(),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xFF6AAB64)),
+                                            hintText: "90 00 00 00",
+                                            border: InputBorder.none,
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xFF6AAB64)),
-                                ),
-                                prefixText: '+228 ',
-                                prefixStyle: TextStyle(color: Colors.black),
-                                filled: true,
-                                fillColor: Colors.white,
-                              ),
-                              keyboardType: TextInputType.phone,
-                            ),
-                          const SizedBox(height: 20),
-                          // Champ "Mot de passe"
+                              ],
+                            )),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Mot de passe',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6AAB64),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                           TextFormField(
                             controller: passwordController,
-                            decoration: const InputDecoration(
-                              labelText: 'Mot de passe',
-                              labelStyle: TextStyle(color: Colors.black),
-                              border: OutlineInputBorder(),
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: "Créez votre mot de passe",
+                          prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF6AAB64)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Color(0xFF6AAB64)),
+                          ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFF6AAB64)),
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Color(0xFF6AAB64)),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFF6AAB64)),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                            obscureText: true,
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Color(0xFF6AAB64), width: 2),
                           ),
-                          const SizedBox(height: 20),
-                          // Bouton "S'inscrire"
+                        ),
+                      ),
+                      const SizedBox(height: 30),
                           ElevatedButton(
                             onPressed: () {
                               if (method.value == 'email') {
@@ -168,8 +303,9 @@ class RegisterScreen extends StatelessWidget {
                                   name: nameController.text,
                                 );
                               } else {
+                            final phone = "+${selectedCountry.phoneCode}${phoneController.text}";
                                 authViewModel.createUser(
-                                  phoneNumber: phoneController.text,
+                              phoneNumber: phone,
                                   password: passwordController.text,
                                   name: nameController.text,
                                 );
@@ -177,35 +313,51 @@ class RegisterScreen extends StatelessWidget {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6AAB64),
-                              minimumSize: const Size(double.infinity, 50),
+                          minimumSize: const Size(double.infinity, 55),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
+                            borderRadius: BorderRadius.circular(15),
                               ),
+                          elevation: 2,
                             ),
                             child: const Text(
                               'S\'inscrire',
-                              style: TextStyle(color: Colors.white, fontSize: 18),
-                            ),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(height: 15),
-                          // Bouton "Continuez avec Google"
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                           OutlinedButton(
                             onPressed: () => authViewModel.createUserWithGoogle(),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.black),
-                              minimumSize: const Size(double.infinity, 50),
+                          minimumSize: const Size(double.infinity, 55),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'lib/assets/images/google_logo.png',
+                              height: 24,
+                            ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              'Continuer avec Google',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            child: const Text(
-                              'Continuez avec Google',
-                              style: TextStyle(color: Colors.black),
+                          ],
                             ),
                           ),
                         ],
-                      ),
-                    ),
                   ),
                 ),
               ),

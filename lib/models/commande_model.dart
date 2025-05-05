@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:miabe_pharmacie/theme/app_theme.dart';
+import 'package:miabe_pharmacie/utils/commande_status_utils.dart';
 
 class CommandeItem {
   final String nom;
@@ -36,32 +38,12 @@ class CommandeModel {
   });
 
   Color getStatusColor() {
-    switch (status.toLowerCase()) {
-      case 'en attente':
-        return Colors.orange;
-      case 'confirmée':
-        return Colors.green;
-      case 'annulée':
-        return Colors.red;
-      case 'terminée':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
+    return CommandeStatusUtils.getStatusColor(status);
   }
 
   String getStatusLabel() {
-    switch (status.toLowerCase()) {
-      case 'en attente':
-        return 'En attente';
-      case 'confirmée':
-        return 'Confirmée';
-      case 'annulée':
-        return 'Annulée';
-      case 'terminée':
-        return 'Terminée';
-      default:
-        return 'Inconnu';
-    }
+    return CommandeStatusUtils.formatStatus(status);
   }
+
+  bool get canCancel => CommandeStatusUtils.canCancel(status);
 }

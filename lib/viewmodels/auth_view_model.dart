@@ -1,13 +1,40 @@
 import 'package:get/get.dart';
 import '../services/auth_service.dart';
+import '../models/user.dart' as app_models;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthViewModel extends GetxController {
   final AuthService _authService;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   final RxBool _isOtpSent = false.obs;
+  final Rx<app_models.User?> _currentUser = Rx<app_models.User?>(null);
 
   AuthViewModel(this._authService);
+
+  app_models.User? get currentUser => _currentUser.value;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    try {
+      final prefs = await Get.find<SharedPreferences>();
+      final userId = prefs.getString('userId');
+      if (userId != null) {
+        _currentUser.value = await _authService.getCurrentUser(userId);
+      }
+    } catch (e) {
+      print('Erreur lors du chargement de l\'utilisateur: $e');
+    }
+  }
+
+  Future<void> refreshCurrentUser() async {
+    await _loadCurrentUser();
+  }
 
   Future<bool> checkAuthStatus() async => await _authService.isUserLoggedIn();
 
@@ -62,7 +89,10 @@ class AuthViewModel extends GetxController {
     isLoading.value = true;
     try {
       bool success = await _authService.signInWithGoogle();
-      if (success) Get.offNamed('/home');
+      if (success) {
+        await refreshCurrentUser();
+        Get.offNamed('/home');
+      }
       return success;
     } catch (e) {
       error.value = e.toString();
@@ -127,6 +157,7 @@ class AuthViewModel extends GetxController {
     try {
       bool success = await _authService.verifyOtp(verificationId, code);
       if (success) {
+        await refreshCurrentUser();
         Get.offAllNamed('/home');
         _isOtpSent.value = false;
       } else {
@@ -144,16 +175,12 @@ class AuthViewModel extends GetxController {
 
   Future<void> signOut() async {
     try {
-      isLoading.value = true;
       await _authService.signOut();
-      _isOtpSent.value = false;
-      error.value = '';
-      isLoading.value = false;
-      Get.offAllNamed('/screen_option');
+      _currentUser.value = null;
+      Get.offAllNamed('/');
     } catch (e) {
-      isLoading.value = false;
-      error.value = e.toString();
-      throw 'Erreur lors de la déconnexion: $e';
+      error.value = 'Erreur lors de la déconnexion: $e';
+      Get.snackbar('Erreur', error.value);
     }
   }
 }

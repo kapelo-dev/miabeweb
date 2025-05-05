@@ -1,202 +1,181 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:miabe_pharmacie/models/commandes.dart';
+import 'package:miabe_pharmacie/theme/app_theme.dart';
+import 'package:miabe_pharmacie/ui/widget/commande_details_sheet.dart';
+import 'package:miabe_pharmacie/utils/commande_status_utils.dart';
 
 class CommandeCard extends StatelessWidget {
   final Commande commande;
-  final Function()? onTap;
-  final Function(String)? onCancelOrder;
+  final Function(String) onCancelOrder;
 
   const CommandeCard({
     Key? key,
     required this.commande,
-    this.onTap,
-    this.onCancelOrder,
+    required this.onCancelOrder,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final statusColor = CommandeStatusUtils.getStatusColor(commande.statusCommande);
+    
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ExpansionTile(
-        title: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Commande #${commande.codeCommande}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    DateFormat('dd/MM/yyyy HH:mm')
-                        .format(commande.dateCommande),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: _getStatusColor(commande.statusCommande),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                commande.statusCommande,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: Colors.grey[200]!,
+          width: 1,
         ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Divider(),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      ),
+      child: InkWell(
+        onTap: () => _showCommandeDetails(context),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  CommandeStatusUtils.getStatusIcon(commande.statusCommande),
+                  color: statusColor,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Total: ${commande.montantTotal} FCFA',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (commande.statusCommande.toLowerCase() == 'en_cours' &&
-                        onCancelOrder != null)
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          // Afficher une boîte de dialogue de confirmation
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Confirmer l\'annulation'),
-                                content: const Text(
-                                    'Voulez-vous vraiment annuler cette commande ?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    child: const Text('Non'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      onCancelOrder!(commande.id);
-                                    },
-                                    child: const Text('Oui'),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.cancel_outlined),
-                        label: const Text('Annuler'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Détails des produits:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ...commande.produits.map((produit) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          (produit as Map)['nom'] ?? 'Nom non disponible',
+                          commande.codeCommande,
                           style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            fontSize: AppTheme.fontSizeNormal,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Quantité: ${produit['quantite']}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            Text(
-                              'Prix: ${produit['prix_unitaire']} FCFA',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        if (produit['sur_ordonnance'] == true)
-                          Container(
-                            margin: const EdgeInsets.only(top: 4),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.red[100],
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'Sur ordonnance',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.red,
-                              ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            CommandeStatusUtils.formatStatus(commande.statusCommande),
+                            style: TextStyle(
+                              color: statusColor,
+                              fontSize: AppTheme.fontSizeXSmall,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
+                        ),
                       ],
                     ),
-                  );
-                }).toList(),
-              ],
-            ),
+                    const SizedBox(height: 4),
+                    Text(
+                      DateFormat('dd/MM/yyyy à HH:mm').format(commande.dateCommande),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.store_outlined,
+                          size: 16,
+                          color: AppTheme.primaryColor,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          commande.pharmacieId,
+                          style: const TextStyle(
+                            fontSize: AppTheme.fontSizeSmall,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${commande.montantTotal} FCFA',
+                          style: const TextStyle(
+                            color: AppTheme.primaryColor,
+                            fontSize: AppTheme.fontSizeSmall,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Color _getStatusColor(String statut) {
-    switch (statut.toLowerCase()) {
-      case 'en_cours':
-        return Colors.orange;
-      case 'validée':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
+  void _showCommandeDetails(BuildContext context) async {
+    // Charger les détails de la commande de manière asynchrone
+    final commandeModel = await commande.toCommandeModelAsync();
+    
+    if (!context.mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.95,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (_, scrollController) => CommandeDetailsSheet(
+          commande: commandeModel,
+          onCancelOrder: (String _) async {
+            // Afficher la boîte de dialogue de confirmation
+            final bool? confirm = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Confirmer l\'annulation'),
+                content: const Text('Êtes-vous sûr de vouloir annuler cette commande ?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Non'),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('Oui, annuler'),
+                  ),
+                ],
+              ),
+            );
+
+            // Si l'utilisateur confirme
+            if (confirm == true) {
+              // Fermer la feuille de détails
+              Navigator.of(context).pop();
+              // Appeler la fonction d'annulation avec l'ID du document
+              onCancelOrder(commande.id);
+            }
+          },
+        ),
+      ),
+    );
   }
 }

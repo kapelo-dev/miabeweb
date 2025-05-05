@@ -17,6 +17,7 @@ import 'viewmodels/edit_profile_viewmodel.dart';
 import 'viewmodels/history_viewmodel.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -70,7 +71,7 @@ class MyApp extends StatelessWidget {
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Miabé Pharmacie',
-        theme: ThemeData(primarySwatch: Colors.green),
+        theme: AppTheme.lightTheme,
         initialRoute: '/',
         getPages: [
           GetPage(

@@ -259,30 +259,11 @@ class AuthService {
 
   Future<void> signOut() async {
     try {
-      // Vérifier si l'utilisateur est connecté via Google avant de tenter la déconnexion
-      bool isSignedIn = false;
-      try {
-        isSignedIn = await _googleSignIn.isSignedIn();
-      } catch (e) {
-        print('Erreur lors de la vérification de la connexion Google: $e');
-        // Continuer même en cas d'erreur
-      }
-      
-      // Déconnexion de Google uniquement si l'utilisateur est connecté via Google
-      if (isSignedIn) {
-        await _googleSignIn.signOut();
-      }
-      
-      // Déconnexion de Firebase
       await _auth.signOut();
-      
-      // Effacement des préférences locales
+      await _googleSignIn.signOut();
+      await _prefs.clear();
       await _prefs.setBool('isAuthenticated', false);
-      await _prefs.remove('userId');
-      // Ne pas effacer toutes les préférences pour éviter des problèmes potentiels
-      print('Déconnexion réussie');
     } catch (e) {
-      print('Erreur lors de la déconnexion: $e');
       throw 'Erreur lors de la déconnexion: $e';
     }
   }

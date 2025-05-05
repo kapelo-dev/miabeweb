@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:miabe_pharmacie/models/produits.dart';
+import 'package:miabe_pharmacie/models/commande_model.dart';
 
 class Commande {
   final String id;
@@ -21,6 +22,91 @@ class Commande {
     required this.montantTotal,
     required this.produits,
   });
+
+  // Méthode de conversion vers CommandeModel
+  CommandeModel toCommandeModel() {
+    List<CommandeItem> items = produits.map((produit) => CommandeItem(
+      nom: produit['nom'] ?? '',
+      description: produit['description'] ?? '',
+      quantite: (produit['quantite'] as num?)?.toInt() ?? 0,
+      prix: (produit['prix_unitaire'] as num?)?.toDouble() ?? 0.0,
+    )).toList();
+
+    // Conversion du statut
+    String convertedStatus = statusCommande.toLowerCase();
+    if (convertedStatus == 'en_cours') {
+      convertedStatus = 'en attente';
+    } else if (convertedStatus == 'validee' || convertedStatus == 'validée') {
+      convertedStatus = 'confirmée';
+    } else if (convertedStatus == 'annulee' || convertedStatus == 'annulée') {
+      convertedStatus = 'annulée';
+    } else if (convertedStatus == 'recuperee' || convertedStatus == 'récupérée') {
+      convertedStatus = 'terminée';
+    }
+
+    return CommandeModel(
+      code_commande: codeCommande,
+      date: dateCommande.toIso8601String(),
+      pharmacieNom: pharmacieId,
+      pharmacieAdresse: '',  // L'adresse sera mise à jour par toCommandeModelAsync
+      items: items,
+      total: '$montantTotal FCFA',
+      status: convertedStatus,
+    );
+  }
+
+  // Nouvelle méthode asynchrone
+  Future<CommandeModel> toCommandeModelAsync() async {
+    try {
+      final pharmacieDoc = await FirebaseFirestore.instance
+          .collection('pharmacies')
+          .doc(pharmacieId)
+          .get();
+          
+      String pharmacieNom = pharmacieId;
+      String pharmacieEmplacement = '';
+      
+      if (pharmacieDoc.exists) {
+        final data = pharmacieDoc.data();
+        if (data != null) {
+          pharmacieNom = data['nom'] ?? pharmacieId;
+          pharmacieEmplacement = data['emplacement'] ?? '';
+        }
+      }
+
+      List<CommandeItem> items = produits.map((produit) => CommandeItem(
+        nom: produit['nom'] ?? '',
+        description: produit['description'] ?? '',
+        quantite: (produit['quantite'] as num?)?.toInt() ?? 0,
+        prix: (produit['prix_unitaire'] as num?)?.toDouble() ?? 0.0,
+      )).toList();
+
+      String convertedStatus = statusCommande.toLowerCase();
+      if (convertedStatus == 'en_cours') {
+        convertedStatus = 'en attente';
+      } else if (convertedStatus == 'validee' || convertedStatus == 'validée') {
+        convertedStatus = 'confirmée';
+      } else if (convertedStatus == 'annulee' || convertedStatus == 'annulée') {
+        convertedStatus = 'annulée';
+      } else if (convertedStatus == 'recuperee' || convertedStatus == 'récupérée') {
+        convertedStatus = 'terminée';
+      }
+
+      return CommandeModel(
+        code_commande: codeCommande,
+        date: dateCommande.toIso8601String(),
+        pharmacieNom: pharmacieNom,
+        pharmacieAdresse: pharmacieEmplacement,
+        items: items,
+        total: '$montantTotal FCFA',
+        status: convertedStatus,
+      );
+    } catch (e) {
+      print('Erreur lors de la récupération des infos de la pharmacie: $e');
+      // En cas d'erreur, retourner le modèle de base
+      return toCommandeModel();
+    }
+  }
 
   factory Commande.fromFirestore(DocumentSnapshot doc, String pharmacieId) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;

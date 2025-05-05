@@ -52,6 +52,12 @@ dependencies:
   provider: ^6.1.1  # Pour la gestion d'état
   font_awesome_flutter: ^10.7.0  # Pour les icônes Font Awesome
   url_launcher: ^6.2.4  # Pour lancer les URLs
+  country_picker: ^2.0.25
+  pin_code_fields: ^8.0.1
+  qr_flutter: ^4.1.0
+  screenshot: ^3.0.0  # Mise à jour vers la dernière version stable
+  image_gallery_saver: ^2.0.3
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
