@@ -9,13 +9,20 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  // Initialiser directement sans late
   final ChatViewModel viewModel = Get.put(ChatViewModel(ChatbotService()));
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Plus besoin d'initialiser viewModel ici
+    Get.put(_scrollController);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    Get.delete<ScrollController>();
+    super.dispose();
   }
 
   @override
@@ -38,12 +45,22 @@ class _ChatScreenState extends State<ChatScreen> {
         // Liste des messages
         Expanded(
           child: Obx(() => ListView.builder(
+            controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             itemCount: viewModel.messages.length,
             reverse: false,
             itemBuilder: (context, index) {
               final message = viewModel.messages[index];
-              return _buildMessageItem(message);
+              return Column(
+                children: [
+                  _buildMessageItem(message),
+                  if (message.widget != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: message.widget!,
+                    ),
+                ],
+              );
             },
           )),
         ),

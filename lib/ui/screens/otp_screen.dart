@@ -93,170 +93,173 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF6AAB64),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Hero(
-                      tag: 'logo',
-                      child: Image.asset('lib/assets/images/logo.png', height: 120),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'MIAWOÉ ZON',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Vérification OTP',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, -5),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(20.0),
-                child: SingleChildScrollView(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/fond.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Container(
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const SizedBox(height: 20),
                       const Text(
-                        'Code de vérification',
+                        'MIAWOÉ ZON',
                         style: TextStyle(
-                          fontSize: 24,
+                          color: Colors.white,
+                          fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF6AAB64),
+                          letterSpacing: 1.2,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30.0),
-                        child: Text(
-                          'Nous vous avons envoyé un code de vérification. Il sera automatiquement détecté.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                        child: PinCodeTextField(
-                          appContext: context,
-                          length: 4,
-                          controller: otpController,
-                          onChanged: (value) {},
-                          onCompleted: (value) => verifyOtp(),
-                          pinTheme: PinTheme(
-                            shape: PinCodeFieldShape.box,
-                            borderRadius: BorderRadius.circular(15),
-                            fieldHeight: 60,
-                            fieldWidth: 50,
-                            activeFillColor: Colors.white,
-                            inactiveFillColor: Colors.white,
-                            selectedFillColor: Colors.white,
-                            activeColor: const Color(0xFF6AAB64),
-                            inactiveColor: Colors.grey[300],
-                            selectedColor: const Color(0xFF6AAB64),
-                          ),
-                          cursorColor: const Color(0xFF6AAB64),
-                          animationDuration: const Duration(milliseconds: 300),
-                          enableActiveFill: true,
-                          keyboardType: TextInputType.number,
-                          boxShadows: [
-                            BoxShadow(
-                              offset: const Offset(0, 1),
-                              color: Colors.black12,
-                              blurRadius: 10,
-                            )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Text(
-                        'Temps restant: ${countdown}s',
+                      const Text(
+                        'Vérification OTP',
                         style: TextStyle(
-                          color: countdown > 10 ? Colors.grey : Colors.red,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                          fontSize: 20,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 40),
-                      ElevatedButton(
-                        onPressed: verifyOtp,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6AAB64),
-                          minimumSize: const Size(double.infinity, 55),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          elevation: 2,
-                        ),
-                        child: const Text(
-                          'Vérifier',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      if (countdown == 0)
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              countdown = 60;
-                            });
-                            startCountdown();
-                            // Ici, vous pouvez ajouter la logique pour renvoyer le code
-                          },
-                          child: const Text(
-                            'Renvoyer le code',
-                            style: TextStyle(
-                              color: Color(0xFF6AAB64),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                flex: 3,
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(20.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Code de vérification',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF6AAB64),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 30.0),
+                          child: Text(
+                            'Nous vous avons envoyé un code de vérification. Il sera automatiquement détecté.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                          child: PinCodeTextField(
+                            appContext: context,
+                            length: 4,
+                            controller: otpController,
+                            onChanged: (value) {},
+                            onCompleted: (value) => verifyOtp(),
+                            pinTheme: PinTheme(
+                              shape: PinCodeFieldShape.box,
+                              borderRadius: BorderRadius.circular(15),
+                              fieldHeight: 60,
+                              fieldWidth: 50,
+                              activeFillColor: Colors.white,
+                              inactiveFillColor: Colors.white,
+                              selectedFillColor: Colors.white,
+                              activeColor: const Color(0xFF6AAB64),
+                              inactiveColor: Colors.grey[300],
+                              selectedColor: const Color(0xFF6AAB64),
+                            ),
+                            cursorColor: const Color(0xFF6AAB64),
+                            animationDuration: const Duration(milliseconds: 300),
+                            enableActiveFill: true,
+                            keyboardType: TextInputType.number,
+                            boxShadows: [
+                              BoxShadow(
+                                offset: const Offset(0, 1),
+                                color: Colors.black12,
+                                blurRadius: 10,
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        Text(
+                          'Temps restant: ${countdown}s',
+                          style: TextStyle(
+                            color: countdown > 10 ? Colors.grey : Colors.red,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        ElevatedButton(
+                          onPressed: verifyOtp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6AAB64),
+                            minimumSize: const Size(double.infinity, 55),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: const Text(
+                            'Vérifier',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (countdown == 0)
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                countdown = 60;
+                              });
+                              startCountdown();
+                              // Ici, vous pouvez ajouter la logique pour renvoyer le code
+                            },
+                            child: const Text(
+                              'Renvoyer le code',
+                              style: TextStyle(
+                                color: Color(0xFF6AAB64),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

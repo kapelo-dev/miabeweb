@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../services/chatbot_service.dart';
+import '../services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../ui/widgets/pharmacy_selector.dart';
+import '../ui/widgets/order_form.dart';
 
 class Message {
   final String text;
   final bool isUser;
   final DateTime timestamp;
+  final Widget? widget;
 
   Message({
     required this.text,
     required this.isUser,
     required this.timestamp,
+    this.widget,
   });
 }
 
@@ -19,9 +27,10 @@ class ChatViewModel extends GetxController {
   final TextEditingController messageController = TextEditingController();
   final RxList<Message> messages = <Message>[].obs;
   final RxBool isLoading = false.obs;
+  final RxBool isOrderMode = false.obs;
+  Map<String, dynamic>? selectedPharmacy;
 
   ChatViewModel(this._chatbotService) {
-    // Ajouter un message de bienvenue
     messages.add(
       Message(
         text: "Salut ! Je suis votre assistant virtuel pour les pharmacies au Togo. Comment puis-je vous aider aujourd'hui ?",
@@ -31,12 +40,130 @@ class ChatViewModel extends GetxController {
     );
   }
 
+  bool _detectOrderIntent(String message) {
+    final keywords = [
+      'commander',
+      'acheter',
+      'passer une commande',
+      'faire une commande',
+      'médicament',
+      'produit',
+      'pharmacie',
+    ];
+
+    message = message.toLowerCase();
+    return keywords.any((keyword) => message.contains(keyword.toLowerCase()));
+  }
+
+  void _handleOrderIntent() {
+    messages.add(
+      Message(
+        text: "Voulez-vous passer une commande ? Répondez par 'oui' ou 'non'.",
+        isUser: false,
+        timestamp: DateTime.now(),
+      ),
+    );
+    isOrderMode.value = true;
+  }
+
+  void _startOrderProcess() {
+    messages.add(
+      Message(
+        text: "D'accord, commençons la commande. Veuillez d'abord sélectionner une pharmacie :",
+        isUser: false,
+        timestamp: DateTime.now(),
+        widget: PharmacySelector(
+          onPharmacySelected: (pharmacy) {
+            selectedPharmacy = pharmacy;
+            messages.add(
+              Message(
+                text: "Vous avez sélectionné la pharmacie ${pharmacy['nom']}. Maintenant, choisissez vos produits :",
+                isUser: false,
+                timestamp: DateTime.now(),
+                widget: OrderForm(
+                  selectedPharmacy: pharmacy,
+                  onOrderSubmit: _submitOrder,
+                ),
+              ),
+            );
+            messages.refresh();
+            Future.delayed(const Duration(milliseconds: 100), () {
+              Get.find<ScrollController>().animateTo(
+                Get.find<ScrollController>().position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            });
+          },
+        ),
+      ),
+    );
+    messages.refresh();
+  }
+
+  Future<void> _submitOrder(List<Map<String, dynamic>> products) async {
+    if (selectedPharmacy == null || products.isEmpty) return;
+
+    isLoading.value = true;
+    try {
+      final prefs = await Get.find<SharedPreferences>();
+      final userId = prefs.getString('userId');
+      
+      if (userId == null) {
+        throw Exception('Utilisateur non connecté');
+      }
+
+      final response = await http.post(
+        Uri.parse('https://miabe-pharmacie-api.onrender.com/api/pharmacies/commandes'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'produits': products.map((p) => {
+            'nom': p['nom'],
+            'quantite': p['quantite'],
+          }).toList(),
+          'status_commande': 'en_cours',
+          'utilisateur': userId,
+          'pharmacieId': selectedPharmacy!['id']
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        messages.add(
+          Message(
+            text: "Votre commande a été enregistrée avec succès ! Vous pouvez la suivre dans la section 'Mes commandes'.",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
+        );
+        Future.delayed(const Duration(milliseconds: 100), () {
+          Get.find<ScrollController>().animateTo(
+            Get.find<ScrollController>().position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        });
+      } else {
+        throw Exception('Erreur lors de la commande: ${response.body}');
+      }
+    } catch (e) {
+      messages.add(
+        Message(
+          text: "Désolé, une erreur s'est produite lors de la commande : $e",
+          isUser: false,
+          timestamp: DateTime.now(),
+        ),
+      );
+    } finally {
+      isLoading.value = false;
+      isOrderMode.value = false;
+      selectedPharmacy = null;
+    }
+  }
+
   void sendMessage() async {
     if (messageController.text.trim().isEmpty) return;
 
     final userMessage = messageController.text.trim();
-    
-    // Ajouter le message de l'utilisateur
     messages.add(
       Message(
         text: userMessage,
@@ -45,32 +172,51 @@ class ChatViewModel extends GetxController {
       ),
     );
     
-    // Vider le champ de texte
     messageController.clear();
-    
-    // Indiquer que la réponse est en cours de chargement
     isLoading.value = true;
     
     try {
-      // Préparer les données de contexte
-      final contextData = await _chatbotService.prepareContextData(userMessage);
-      
-      // Envoyer le message à l'API Deepseek
-      final botResponse = await _chatbotService.sendMessageToDeepseek(
-        userMessage,
-        contextData,
-      );
-      
-      // Ajouter la réponse du chatbot
-      messages.add(
-        Message(
-          text: botResponse,
-          isUser: false,
-          timestamp: DateTime.now(),
-        ),
-      );
+      if (isOrderMode.value) {
+        if (userMessage.toLowerCase() == 'oui') {
+          _startOrderProcess();
+        } else if (userMessage.toLowerCase() == 'non') {
+          messages.add(
+            Message(
+              text: "D'accord, comment puis-je vous aider autrement ?",
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          );
+          isOrderMode.value = false;
+        } else {
+          messages.add(
+            Message(
+              text: "Je n'ai pas compris votre réponse. Veuillez répondre par 'oui' ou 'non'.",
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          );
+        }
+      } else {
+        if (_detectOrderIntent(userMessage)) {
+          _handleOrderIntent();
+        } else {
+          final contextData = await _chatbotService.prepareContextData(userMessage);
+          final botResponse = await _chatbotService.sendMessageToDeepseek(
+            userMessage,
+            contextData,
+          );
+          
+          messages.add(
+            Message(
+              text: botResponse,
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          );
+        }
+      }
     } catch (e) {
-      // En cas d'erreur, ajouter un message d'erreur
       messages.add(
         Message(
           text: "Désolé, une erreur s'est produite. Veuillez réessayer.",
@@ -80,7 +226,6 @@ class ChatViewModel extends GetxController {
       );
       print("Erreur lors de l'envoi du message: $e");
     } finally {
-      // Désactiver l'indicateur de chargement
       isLoading.value = false;
     }
   }

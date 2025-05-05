@@ -73,216 +73,202 @@ class _ScreenOptionState extends State<ScreenOption> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-        child: Column(
-          children: [
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Hero(
-                      tag: 'logo',
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/fond.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+          child: Column(
+            children: [
+                Container(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 24),
+                      const Text(
+                        'MIAWOÉ ZON',
+                        style: TextStyle(
                           color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 20,
-                              spreadRadius: 5,
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black26,
+                              offset: Offset(0, 2),
+                              blurRadius: 4,
                             ),
                           ],
                         ),
-                        child: Image.asset(
-                          'lib/assets/images/logo.png',
-                          height: 100,
-                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'MIAWOÉ ZON',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            offset: Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                        ],
+                    ],
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height - 300,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, -5),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - 300,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 20,
-                      offset: const Offset(0, -5),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-                  child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      padding: const EdgeInsets.all(5),
-                      child: Row(
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                    child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                          Expanded(
-                            child: _buildOptionTab(
-                              icon: Icons.email_outlined,
-                              title: 'Email',
-                              isSelected: selectedOption == 'email',
-                              onTap: () => setState(() => selectedOption = 'email'),
-                            ),
-                          ),
-                          Expanded(
-                            child: _buildOptionTab(
-                              icon: Icons.phone_android,
-                              title: 'Téléphone',
-                              isSelected: selectedOption == 'phone',
-                              onTap: () => setState(() => selectedOption = 'phone'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    if (selectedOption == 'email')
-                      _buildTextField(
-                        controller: emailController,
-                        hintText: 'Adresse email',
-                        icon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
-                      )
-                    else
-                      _buildPhoneField(),
-                    const SizedBox(height: 20),
-                    _buildPasswordField(),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: _handleLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Se connecter',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
+                        padding: const EdgeInsets.all(5),
+                        child: Row(
                       children: [
-                        Expanded(child: Divider(color: Colors.grey[300])),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'OU',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
+                            Expanded(
+                              child: _buildOptionTab(
+                                icon: Icons.email_outlined,
+                                title: 'Email',
+                                isSelected: selectedOption == 'email',
+                                onTap: () => setState(() => selectedOption = 'email'),
+                              ),
                             ),
-                          ),
-                        ),
-                        Expanded(child: Divider(color: Colors.grey[300])),
-                      ],
-                      ),
-                    const SizedBox(height: 24),
-                    OutlinedButton.icon(
-                      onPressed: () async {
-                        final AuthViewModel authViewModel = Get.find<AuthViewModel>();
-                        try {
-                          await authViewModel.signInWithGoogle();
-                        } catch (e) {
-                          Get.snackbar(
-                            'Erreur',
-                            'Échec de la connexion avec Google: ${e.toString()}',
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            snackPosition: SnackPosition.TOP,
-                          );
-                        }
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: BorderSide(color: Colors.grey[300]!),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                      ),
-                      icon: Image.asset(
-                        'lib/assets/images/google_logo.png',
-                        height: 24,
-                      ),
-                      label: const Text(
-                        'Continuer avec Google',
-                                style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    const SizedBox(height: 24),
-                    TextButton(
-                      onPressed: () => Get.to(() => const RegisterScreen()),
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          text: 'Pas encore de compte ? ',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                          children: const [
-                            TextSpan(
-                              text: 'Créer un compte',
-                              style: TextStyle(
-                                color: AppTheme.primaryColor,
-                                fontWeight: FontWeight.w600,
+                            Expanded(
+                              child: _buildOptionTab(
+                                icon: Icons.phone_android,
+                                title: 'Téléphone',
+                                isSelected: selectedOption == 'phone',
+                                onTap: () => setState(() => selectedOption = 'phone'),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 32),
+                      if (selectedOption == 'email')
+                        _buildTextField(
+                          controller: emailController,
+                          hintText: 'Adresse email',
+                          icon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                        )
+                      else
+                        _buildPhoneField(),
+                      const SizedBox(height: 20),
+                      _buildPasswordField(),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: _handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Se connecter',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.grey[300])),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'OU',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: Colors.grey[300])),
+                        ],
+                        ),
+                      const SizedBox(height: 24),
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          final AuthViewModel authViewModel = Get.find<AuthViewModel>();
+                          try {
+                            await authViewModel.signInWithGoogle();
+                          } catch (e) {
+                            Get.snackbar(
+                              'Erreur',
+                              'Échec de la connexion avec Google: ${e.toString()}',
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                              snackPosition: SnackPosition.TOP,
+                            );
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide(color: Colors.grey[300]!),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                        ),
+                        icon: Image.asset(
+                          'assets/images/google_logo.png',
+                          height: 24,
+                        ),
+                        label: const Text(
+                          'Continuer avec Google',
+                                  style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+                      TextButton(
+                        onPressed: () => Get.to(() => const RegisterScreen()),
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: 'Pas encore de compte ? ',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                            children: const [
+                              TextSpan(
+                                text: 'Créer un compte',
+                                style: TextStyle(
+                                  color: AppTheme.primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -108,33 +108,34 @@ class AuthService {
     }
   }
 
-  Future<bool> signInWithGoogle() async {
+  Future<UserCredential> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      return await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } catch (e) {
+      throw Exception('Erreur de connexion: $e');
+    }
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return false;
+      
+      if (googleUser == null) {
+        throw Exception('Connexion Google annulée');
+      }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-      final user = userCredential.user!;
-
-      final doc =
-          await _firestore.collection('utilisateur').doc(user.email).get();
-      if (!doc.exists) {
-        throw 'Utilisateur non trouvé dans la base de données';
-      }
-
-      await _prefs.setBool('isAuthenticated', true);
-      await _prefs.setString('userId', user.email!);
-      return true;
+      return await _auth.signInWithCredential(credential);
     } catch (e) {
-      throw 'Erreur lors de la connexion Google : $e';
+      throw Exception('Erreur de connexion Google: $e');
     }
   }
 
@@ -258,14 +259,8 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    try {
-      await _auth.signOut();
-      await _googleSignIn.signOut();
-      await _prefs.clear();
-      await _prefs.setBool('isAuthenticated', false);
-    } catch (e) {
-      throw 'Erreur lors de la déconnexion: $e';
-    }
+    await _googleSignIn.signOut();
+    await _auth.signOut();
   }
 
   Future<app_models.User?> getCurrentUser(String userId) async {

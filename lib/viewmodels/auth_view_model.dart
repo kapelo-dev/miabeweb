@@ -88,12 +88,13 @@ class AuthViewModel extends GetxController {
     if (isLoading.value) return false;
     isLoading.value = true;
     try {
-      bool success = await _authService.signInWithGoogle();
-      if (success) {
+      final userCredential = await _authService.signInWithGoogle();
+      if (userCredential.user != null) {
         await refreshCurrentUser();
         Get.offNamed('/home');
+        return true;
       }
-      return success;
+      return false;
     } catch (e) {
       error.value = e.toString();
       Get.snackbar('Erreur', e.toString());
