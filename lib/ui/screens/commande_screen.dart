@@ -21,13 +21,7 @@ class CommandeScreen extends StatelessWidget {
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Miabé Pharmacie',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            
             Text(
               'Mes Commandes',
               style: TextStyle(
@@ -41,35 +35,6 @@ class CommandeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _viewModel.refreshCommandes(),
-          ),
-          PopupMenuButton(
-            icon: const Icon(Icons.more_vert),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.logout,
-                    color: Colors.red,
-                  ),
-                  title: const Text(
-                    'Déconnexion',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  onTap: () {
-                    // Ajouter la logique de déconnexion ici
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
           ),
         ],
       ),

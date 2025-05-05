@@ -169,22 +169,24 @@ class _ScreenOptionState extends State<ScreenOption> {
                       const SizedBox(height: 20),
                       _buildPasswordField(),
                       const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: _handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: _handleLogin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            elevation: 0,
                           ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'Se connecter',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          child: const Text(
+                            'Se connecter',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
@@ -204,43 +206,52 @@ class _ScreenOptionState extends State<ScreenOption> {
                           ),
                           Expanded(child: Divider(color: Colors.grey[300])),
                         ],
-                        ),
+                      ),
                       const SizedBox(height: 24),
-                      OutlinedButton.icon(
-                        onPressed: () async {
-                          final AuthViewModel authViewModel = Get.find<AuthViewModel>();
-                          try {
-                            await authViewModel.signInWithGoogle();
-                          } catch (e) {
-                            Get.snackbar(
-                              'Erreur',
-                              'Échec de la connexion avec Google: ${e.toString()}',
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                              snackPosition: SnackPosition.TOP,
-                            );
-                          }
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(color: Colors.grey[300]!),
-                          shape: RoundedRectangleBorder(
+                      Center(
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            final AuthViewModel authViewModel = Get.find<AuthViewModel>();
+                            try {
+                              await authViewModel.signInWithGoogle();
+                            } catch (e) {
+                              Get.snackbar(
+                                'Erreur',
+                                'Échec de la connexion avec Google: ${e.toString()}',
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                                snackPosition: SnackPosition.TOP,
+                              );
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            side: const BorderSide(color: Colors.black12),
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
                             ),
-                        ),
-                        icon: Image.asset(
-                          'assets/images/google_logo.png',
-                          height: 24,
-                        ),
-                        label: const Text(
-                          'Continuer avec Google',
-                                  style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/images/google_logo.png',
+                                height: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Continuer avec Google',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                      ),
                       const SizedBox(height: 24),
                       TextButton(
                         onPressed: () => Get.to(() => const RegisterScreen()),
@@ -329,18 +340,24 @@ class _ScreenOptionState extends State<ScreenOption> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.grey[300]!),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey[500]),
-          prefixIcon: Icon(icon, color: Colors.grey[600], size: 22),
+          hintStyle: TextStyle(color: Colors.grey[400]),
+          prefixIcon: Icon(icon, color: Colors.grey[400], size: 22),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),
@@ -351,11 +368,17 @@ class _ScreenOptionState extends State<ScreenOption> {
   Widget _buildPhoneField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.grey[300]!),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           GestureDetector(
@@ -391,34 +414,26 @@ class _ScreenOptionState extends State<ScreenOption> {
                 },
               );
             },
-                        child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Colors.grey[300]!),
-                          ),
-              child: Row(
-                children: [
-                  Text(
-                    selectedCountry.flagEmoji,
-                    style: const TextStyle(fontSize: 20),
+            child: Row(
+              children: [
+                Text(
+                  selectedCountry.flagEmoji,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '+${selectedCountry.phoneCode}',
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '+${selectedCountry.phoneCode}',
-                    style: TextStyle(
-                      color: Colors.grey[800],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                  Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.grey[600],
-                      ),
-                    ],
-                  ),
+                ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.grey[600],
+                ),
+              ],
             ),
           ),
           const SizedBox(width: 8),
@@ -432,13 +447,13 @@ class _ScreenOptionState extends State<ScreenOption> {
               ),
               decoration: InputDecoration(
                 hintText: 'Numéro de téléphone',
-                hintStyle: TextStyle(color: Colors.grey[500]),
+                hintStyle: TextStyle(color: Colors.grey[400]),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                ),
               ),
             ),
-          ],
+          ),
+        ],
       ),
     );
   }
@@ -446,22 +461,28 @@ class _ScreenOptionState extends State<ScreenOption> {
   Widget _buildPasswordField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.grey[300]!),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextField(
         controller: passwordController,
         obscureText: !isPasswordVisible,
         decoration: InputDecoration(
           hintText: 'Mot de passe',
-          hintStyle: TextStyle(color: Colors.grey[500]),
-          prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[600], size: 22),
+          hintStyle: TextStyle(color: Colors.grey[400]),
+          prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400], size: 22),
           suffixIcon: IconButton(
             icon: Icon(
               isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-              color: Colors.grey[600],
+              color: Colors.grey[400],
               size: 22,
             ),
             onPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),

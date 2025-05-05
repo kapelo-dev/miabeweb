@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,7 +14,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-  final AuthService _authService = AuthService();
+  late final AuthService _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAuthService();
+  }
+
+  Future<void> _initializeAuthService() async {
+    final prefs = await SharedPreferences.getInstance();
+    _authService = AuthService(prefs);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,73 +141,80 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 30),
                   // Bouton de connexion
-                  Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: ElevatedButton(
-                        onPressed: _handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6AAB64),
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: 5,
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton(
+                      onPressed: _handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6AAB64),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        child: const Text(
-                          'Se connecter',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Se connecter',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Center(
-                    child: Text(
-                      'OU',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: Colors.white70)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'OU',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
+                      Expanded(child: Divider(color: Colors.white70)),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   // Bouton Google
                   Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: TextButton.icon(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: OutlinedButton(
                       onPressed: _handleGoogleSignIn,
-                      icon: Image.asset(
-                        'assets/images/google_logo.png',
-                        height: 24,
-                      ),
-                      label: const Text(
-                        'Continuer avec Google',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 16,
-                        ),
-                      ),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: BorderSide.none,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
+                        elevation: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/google_logo.png',
+                            height: 24,
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Continuer avec Google',
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -205,17 +224,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: RichText(
                       text: TextSpan(
                         text: 'Pas encore de compte ? ',
-                        style: const TextStyle(color: Colors.white70),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                         children: [
                           TextSpan(
                             text: 'Créer un compte',
                             style: const TextStyle(
                               color: Color(0xFF6AAB64),
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                // Navigation vers la page d'inscription
+                                Get.toNamed('/register');
                               },
                           ),
                         ],

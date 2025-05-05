@@ -205,55 +205,59 @@ class _PhoneScreenState extends State<PhoneScreen> {
                           ),
                         ),
                         const SizedBox(height: 30),
-                        ElevatedButton(
-                          onPressed: () {
-                            final phone = "+${selectedCountry.phoneCode}${phoneController.text}";
-                            authViewModel.verifyPhoneNumber(phone, passwordController.text);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6AAB64),
-                            minimumSize: const Size(double.infinity, 55),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final phone = "+${selectedCountry.phoneCode}${phoneController.text}";
+                              authViewModel.verifyPhoneNumber(phone, passwordController.text);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6AAB64),
+                              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 2,
                             ),
-                            elevation: 2,
-                          ),
-                          child: const Text(
-                            'Connexion',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                            child: const Text(
+                              'Connexion',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
-                        OutlinedButton(
-                          onPressed: () => authViewModel.signInWithGoogle(),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.black),
-                            minimumSize: const Size(double.infinity, 55),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                        Center(
+                          child: OutlinedButton(
+                            onPressed: () => authViewModel.signInWithGoogle(),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.black),
+                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/images/google_logo.png',
-                                height: 24,
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Continuer avec Google',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'assets/images/google_logo.png',
+                                  height: 24,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'Continuer avec Google',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],

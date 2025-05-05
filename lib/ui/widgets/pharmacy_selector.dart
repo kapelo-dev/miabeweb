@@ -161,7 +161,7 @@ class _PharmacySelectorState extends State<PharmacySelector> {
                     ),
                   ),
                   child: const Text(
-                    'Pharmacies Ouvertes',
+                    'Pharmacies Proches',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

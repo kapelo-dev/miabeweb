@@ -296,67 +296,113 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         const SizedBox(height: 30),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (method.value == 'email') {
-                              authViewModel.createUser(
-                                email: emailController.text,
-                                password: passwordController.text,
-                                name: nameController.text,
-                              );
-                            } else {
-                              final phone = "+${selectedCountry.phoneCode}${phoneController.text}";
-                              authViewModel.createUser(
-                                phoneNumber: phone,
-                                password: passwordController.text,
-                                name: nameController.text,
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6AAB64),
-                            minimumSize: const Size(double.infinity, 55),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (method.value == 'email') {
+                                authViewModel.createUser(
+                                  email: emailController.text,
+                                  password: passwordController.text,
+                                  name: nameController.text,
+                                );
+                              } else {
+                                final phone = "+${selectedCountry.phoneCode}${phoneController.text}";
+                                authViewModel.createUser(
+                                  phoneNumber: phone,
+                                  password: passwordController.text,
+                                  name: nameController.text,
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6AAB64),
+                              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 2,
                             ),
-                            elevation: 2,
-                          ),
-                          child: const Text(
-                            'S\'inscrire',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                            child: const Text(
+                              'S\'inscrire',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
-                        OutlinedButton(
-                          onPressed: () => authViewModel.createUserWithGoogle(),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.black),
-                            minimumSize: const Size(double.infinity, 55),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/images/google_logo.png',
-                                height: 24,
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Continuer avec Google',
+                        Row(
+                          children: [
+                            Expanded(child: Divider(color: Colors.grey[300])),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'OU',
                                 style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            ],
+                            ),
+                            Expanded(child: Divider(color: Colors.grey[300])),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: OutlinedButton(
+                            onPressed: () => authViewModel.createUserWithGoogle(),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.black),
+                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'assets/images/google_logo.png',
+                                  height: 24,
+                                ),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'Continuer avec Google',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Get.back(),
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                text: 'J\'ai déjà un compte ? ',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                                children: const [
+                                  TextSpan(
+                                    text: 'Se connecter',
+                                    style: TextStyle(
+                                      color: Color(0xFF6AAB64),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],
