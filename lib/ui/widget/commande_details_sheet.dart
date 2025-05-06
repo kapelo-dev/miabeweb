@@ -427,11 +427,12 @@ class _CommandeDetailsSheetState extends State<CommandeDetailsSheet> {
 
                       if (pharmacieDoc.docs.isNotEmpty) {
                         final pharmacieData = pharmacieDoc.docs.first.data();
-                        final telephone1 = pharmacieData['telephone1'] as String?;
-                        final telephone2 = pharmacieData['telephone2'] as String?;
+                        // Conversion explicite en String
+                        final telephone1 = pharmacieData['telephone1']?.toString();
+                        final telephone2 = pharmacieData['telephone2']?.toString();
 
-                        if (telephone1?.isNotEmpty == true || telephone2?.isNotEmpty == true) {
-                          // Si nous avons deux numéros, montrer un dialogue de sélection
+                        if ((telephone1?.isNotEmpty ?? false) || (telephone2?.isNotEmpty ?? false)) {
+                          // Si nous avons deux numéros valides, montrer un dialogue de sélection
                           if (telephone1?.isNotEmpty == true && telephone2?.isNotEmpty == true) {
                             showDialog(
                               context: context,
@@ -445,7 +446,7 @@ class _CommandeDetailsSheetState extends State<CommandeDetailsSheet> {
                                         leading: const Icon(Icons.phone),
                                         title: Text(telephone1!),
                                         onTap: () async {
-                                          Navigator.pop(context);
+                                          Navigator.of(context).pop();
                                           final Uri url = Uri.parse('tel:$telephone1');
                                           if (await canLaunchUrl(url)) {
                                             await launchUrl(url);
@@ -456,7 +457,7 @@ class _CommandeDetailsSheetState extends State<CommandeDetailsSheet> {
                                         leading: const Icon(Icons.phone),
                                         title: Text(telephone2!),
                                         onTap: () async {
-                                          Navigator.pop(context);
+                                          Navigator.of(context).pop();
                                           final Uri url = Uri.parse('tel:$telephone2');
                                           if (await canLaunchUrl(url)) {
                                             await launchUrl(url);
@@ -470,10 +471,12 @@ class _CommandeDetailsSheetState extends State<CommandeDetailsSheet> {
                             );
                           } else {
                             // Si nous n'avons qu'un seul numéro, l'appeler directement
-                            final telephone = telephone1 ?? telephone2;
-                            final Uri url = Uri.parse('tel:$telephone');
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url);
+                            final telephone = telephone1?.isNotEmpty == true ? telephone1 : telephone2;
+                            if (telephone != null) {
+                              final Uri url = Uri.parse('tel:$telephone');
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              }
                             }
                           }
                         } else {

@@ -15,10 +15,37 @@ class AuthService {
 
   AuthService(this._prefs);
 
-  Future<bool> isUserLoggedIn() async =>
-      _prefs.getBool('isAuthenticated') ?? false;
+  // Clés pour SharedPreferences
+  static const String KEY_USER_ID = 'userId';
+  static const String KEY_USER_EMAIL = 'userEmail';
+  static const String KEY_USER_PHONE = 'userPhone';
+  static const String KEY_IS_AUTHENTICATED = 'isAuthenticated';
+  static const String KEY_AUTH_METHOD = 'authMethod';
+  static const String KEY_PASSWORD = 'hashedPassword';
 
-  Future<String?> getUserId() async => _prefs.getString('userId');
+  Future<bool> isUserLoggedIn() async {
+    final isAuthenticated = _prefs.getBool(KEY_IS_AUTHENTICATED) ?? false;
+    if (!isAuthenticated) return false;
+
+    // Vérifier si les informations de connexion sont stockées
+    final userId = _prefs.getString(KEY_USER_ID);
+    final authMethod = _prefs.getString(KEY_AUTH_METHOD);
+    final hashedPassword = _prefs.getString(KEY_PASSWORD);
+
+    if (userId == null || authMethod == null || hashedPassword == null) {
+      return false;
+    }
+
+    // Vérifier si l'utilisateur existe toujours dans Firestore
+    try {
+      final userDoc = await _firestore.collection('utilisateur').doc(userId).get();
+      return userDoc.exists && userDoc.data()?['password'] == hashedPassword;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<String?> getUserId() async => _prefs.getString(KEY_USER_ID);
 
   String _hashPassword(String password) {
     var bytes = utf8.encode(password);
@@ -28,6 +55,20 @@ class AuthService {
 
   String _generateOtp() => (1000 + Random().nextInt(9000)).toString();
 
+  Future<void> _saveAuthData(String userId, String authMethod, String password) async {
+    await _prefs.setString(KEY_USER_ID, userId);
+    await _prefs.setString(KEY_AUTH_METHOD, authMethod);
+    await _prefs.setString(KEY_PASSWORD, _hashPassword(password));
+    await _prefs.setBool(KEY_IS_AUTHENTICATED, true);
+
+    // Sauvegarder email ou téléphone selon le type d'identifiant
+    if (userId.contains('@')) {
+      await _prefs.setString(KEY_USER_EMAIL, userId);
+    } else {
+      await _prefs.setString(KEY_USER_PHONE, userId);
+    }
+  }
+
   Future<void> signInWithEmail({
     required String email,
     required String password,
@@ -35,11 +76,8 @@ class AuthService {
     required Function(String) onError,
   }) async {
     try {
-      // Normalisation de l'email
       final normalizedEmail = email.trim().toLowerCase();
-
-      final doc =
-          await _firestore.collection('utilisateur').doc(normalizedEmail).get();
+      final doc = await _firestore.collection('utilisateur').doc(normalizedEmail).get();
 
       if (!doc.exists) {
         onError('Aucun utilisateur trouvé avec cet email');
@@ -55,6 +93,9 @@ class AuthService {
       }
 
       if (data['password'] == _hashPassword(password)) {
+        // Sauvegarder les informations d'authentification
+        await _saveAuthData(normalizedEmail, 'email', password);
+        
         String otp = _generateOtp();
         await _prefs.setString('tempOtp', otp);
         await _prefs.setString('tempUserId', normalizedEmail);
@@ -74,13 +115,11 @@ class AuthService {
     required Function(String) onError,
   }) async {
     try {
-      // Normalisation du numéro de téléphone avec le préfixe +228
       final normalizedPhone = phoneNumber.startsWith('+228')
           ? phoneNumber.trim()
           : '+228${phoneNumber.trim()}';
 
-      final doc =
-          await _firestore.collection('utilisateur').doc(normalizedPhone).get();
+      final doc = await _firestore.collection('utilisateur').doc(normalizedPhone).get();
 
       if (!doc.exists) {
         onError('Aucun utilisateur trouvé avec ce numéro');
@@ -96,6 +135,9 @@ class AuthService {
       }
 
       if (data['password'] == _hashPassword(password)) {
+        // Sauvegarder les informations d'authentification
+        await _saveAuthData(normalizedPhone, 'phone', password);
+        
         String otp = _generateOtp();
         await _prefs.setString('tempOtp', otp);
         await _prefs.setString('tempUserId', normalizedPhone);
@@ -259,8 +301,9 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-        await _googleSignIn.signOut();
-      await _auth.signOut();
+    await _prefs.clear();
+    await _auth.signOut();
+    await _googleSignIn.signOut();
   }
 
   Future<app_models.User?> getCurrentUser(String userId) async {

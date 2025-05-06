@@ -21,6 +21,13 @@ class HistoryCard extends StatelessWidget {
            status == 'récupérée' || status == 'recuperee';
   }
 
+  String _formatOrderCode(String code) {
+    if (code.length > 10) {
+      return '${code.substring(0, 7)}...';
+    }
+    return code;
+  }
+
   @override
   Widget build(BuildContext context) {
     final statusColor = CommandeStatusUtils.getStatusColor(order.statusCommande ?? 'En attente');
@@ -47,27 +54,45 @@ class HistoryCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Commande #${order.codeCommande}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text(
+                              'Commande #',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                _formatOrderCode(order.codeCommande),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _formatDate(order.dateCommande),
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
+                        const SizedBox(height: 4),
+                        Text(
+                          _formatDate(order.dateCommande),
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       if (_canHide)
                         IconButton(
@@ -75,10 +100,12 @@ class HistoryCard extends StatelessWidget {
                           onPressed: () => _confirmDelete(context),
                           tooltip: 'Supprimer la commande',
                           color: Colors.red[400],
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: statusColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
@@ -92,7 +119,7 @@ class HistoryCard extends StatelessWidget {
                           children: [
                             Icon(
                               statusIcon,
-                              size: 16,
+                              size: 14,
                               color: statusColor,
                             ),
                             const SizedBox(width: 4),

@@ -12,6 +12,24 @@ import '../../viewmodels/auth_view_model.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  String _getDisplayName(dynamic user) {
+    if (user?.nom?.isNotEmpty == true) {
+      return user!.nom;
+    } else if (user?.email?.isNotEmpty == true) {
+      return user!.email;
+    }
+    return 'Utilisateur';
+  }
+
+  String _getInitial(dynamic user) {
+    if (user?.nom?.isNotEmpty == true) {
+      return user!.nom.substring(0, 1).toUpperCase();
+    } else if (user?.email?.isNotEmpty == true) {
+      return user!.email.substring(0, 1).toUpperCase();
+    }
+    return 'U';
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = Get.find<AuthService>();
@@ -30,13 +48,18 @@ class ProfileScreen extends StatelessWidget {
             backgroundColor: const Color(0xFF6AAB64),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF6AAB64),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFF6AAB64),
-                      const Color(0xFF6AAB64).withOpacity(0.8),
+                      Color(0xFF6AAB64),
+                      Color(0xFF6AAB64),
                     ],
                   ),
                 ),
@@ -46,13 +69,9 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 40),
                     CircleAvatar(
                       radius: 50,
-      backgroundColor: Colors.white,
+                      backgroundColor: Colors.white,
                       child: Text(
-                        user?.nom?.isNotEmpty == true
-                            ? user!.nom.substring(0, 1).toUpperCase()
-                            : (user?.email?.isNotEmpty == true
-                                ? user!.email.substring(0, 1).toUpperCase()
-                                : 'U'),
+                        _getInitial(user),
                         style: const TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -62,25 +81,13 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      user?.nom?.isNotEmpty == true
-                          ? user!.nom
-                          : (user?.email?.isNotEmpty == true
-                              ? user!.email
-                              : 'Utilisateur'),
+                      _getDisplayName(user),
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    if (user?.nom?.isNotEmpty == true && user?.email?.isNotEmpty == true)
-                      Text(
-                        user?.email ?? '',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
-      ),
-                      ),
                   ],
                 ),
               ),

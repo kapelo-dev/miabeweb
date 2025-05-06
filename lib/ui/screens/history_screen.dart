@@ -265,8 +265,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
+                              ),
+                            ),
                         icon: const Icon(Icons.refresh),
                         label: const Text('Réessayer'),
                       ),
@@ -292,14 +292,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   'En cours',
                                   Icons.hourglass_empty,
                                   AppTheme.warningColor,
-                                ),
+                                        ),
                                 _buildDivider(),
                                 _buildStatItem(
                                   valideesCount.toString(),
                                   'Validées',
                                   Icons.check_circle_outline,
                                   AppTheme.successColor,
-                                ),
+                                            ),
                                 _buildDivider(),
                                 _buildStatItem(
                                   totalCount.toString(),
@@ -323,8 +323,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 Icons.receipt_long_outlined,
                                 size: 64,
                                 color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
+              ),
+              const SizedBox(height: 16),
                               Text(
                                 'Aucune commande trouvée',
                                   style: TextStyle(

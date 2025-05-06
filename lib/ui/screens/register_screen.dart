@@ -124,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                             ),
-                          ),
+                              ),
                         ),
                         const SizedBox(height: 20),
                         Obx(() => Row(
@@ -396,7 +396,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 14,
-                                ),
+                            ),
                                 children: const [
                                   TextSpan(
                                     text: 'Se connecter',

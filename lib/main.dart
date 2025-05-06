@@ -23,18 +23,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Attendre que l'authentification soit stable
-  await Future.delayed(const Duration(seconds: 1));
-
-  final currentUser = FirebaseAuth.instance.currentUser;
-  print('Utilisateur connecté : ${currentUser?.email ?? "Aucun utilisateur"}');
-
   // Initialisation des dépendances
   final prefs = await SharedPreferences.getInstance();
-  if (currentUser?.email != null) {
-    await prefs.setString('userEmail', currentUser!.email!);
-  }
-
   final authService = AuthService(prefs);
   final orderService = OrderService();
   final historyViewModel = HistoryViewModel();
@@ -45,12 +35,33 @@ void main() async {
   Get.put(EditProfileViewModel(authService));
   Get.put(historyViewModel);
 
-  // Vérification de l'authentification et des données utilisateur
-  final isAuthenticated = currentUser != null;
-  await prefs.setBool('isAuthenticated', isAuthenticated);
+  // Vérifier si l'utilisateur est déjà connecté
+  final isAuthenticated = await authService.isUserLoggedIn();
+  
   if (isAuthenticated) {
-    await prefs.setString('userEmail', currentUser?.email ?? '');
-    await historyViewModel.verifyUserInFirestore();
+    // Récupérer l'ID de l'utilisateur
+    final userId = await authService.getUserId();
+    if (userId != null) {
+      // Mettre à jour les données de l'utilisateur
+      await historyViewModel.verifyUserInFirestore();
+      
+      // Configurer Firebase Auth si nécessaire
+      if (userId.contains('@') && FirebaseAuth.instance.currentUser == null) {
+        try {
+          // Reconnecter l'utilisateur à Firebase Auth
+          final email = prefs.getString(AuthService.KEY_USER_EMAIL);
+          final hashedPassword = prefs.getString(AuthService.KEY_PASSWORD);
+          if (email != null && hashedPassword != null) {
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: email,
+              password: hashedPassword,
+            );
+          }
+        } catch (e) {
+          print('Erreur de reconnexion Firebase: $e');
+        }
+      }
+    }
   }
 
   runApp(MyApp(isAuthenticated: isAuthenticated));
