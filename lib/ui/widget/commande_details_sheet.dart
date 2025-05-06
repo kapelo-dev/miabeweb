@@ -5,7 +5,8 @@ import 'package:miabe_pharmacie/models/commande_model.dart';
 import 'package:miabe_pharmacie/theme/app_theme.dart';
 import 'package:miabe_pharmacie/utils/commande_status_utils.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -68,23 +69,25 @@ class _CommandeDetailsSheetState extends State<CommandeDetailsSheet> {
     try {
       final response = await http.get(Uri.parse(qrCodeUrl!));
       if (response.statusCode == 200) {
-        final result = await ImageGallerySaver.saveImage(
-          response.bodyBytes,
-          name: 'commande_${widget.commande.code_commande}_qr',
-          quality: 100,
-        );
-        
-        if (result['isSuccess']) {
-          Get.snackbar(
-            'Succès',
-            'QR Code sauvegardé dans la galerie',
-            backgroundColor: AppTheme.successColor,
-            colorText: Colors.white,
-            snackPosition: SnackPosition.TOP,
-          );
-        } else {
-          throw Exception('Échec de la sauvegarde');
+        // Get downloads directory
+        final directory = await getExternalStorageDirectory();
+        if (directory == null) {
+          throw Exception('Impossible d\'accéder au stockage');
         }
+        
+        final imagePath = '${directory.path}/commande_${widget.commande.code_commande}_qr.png';
+        
+        // Write image to file
+        final imageFile = File(imagePath);
+        await imageFile.writeAsBytes(response.bodyBytes);
+        
+        Get.snackbar(
+          'Succès',
+          'QR Code sauvegardé dans ${directory.path}',
+          backgroundColor: AppTheme.successColor,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
       }
     } catch (e) {
       Get.snackbar(

@@ -1,2 +1,0 @@
-C:/Users/DELL/Documents/COURS/prj etude de cas/new clone/miabePharmacie/android/app/.cxx/Debug/41692i5j/x86/CMakeFiles/edit_cache.dir
-C:/Users/DELL/Documents/COURS/prj etude de cas/new clone/miabePharmacie/android/app/.cxx/Debug/41692i5j/x86/CMakeFiles/rebuild_cache.dir

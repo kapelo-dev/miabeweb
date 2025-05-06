@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               gap: 8,
               tabs: const [
-                GButton(icon: Icons.home, text: 'Home'),
+                GButton(icon: Icons.home, text: 'Accueil'),
                 GButton(icon: Icons.headset_mic, text: 'Assistant'),
                 GButton(icon: Icons.shopping_cart, text: 'Commande'),
                 GButton(icon: Icons.person, text: 'Profil'),
