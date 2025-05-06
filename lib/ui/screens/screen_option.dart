@@ -82,30 +82,30 @@ class _ScreenOptionState extends State<ScreenOption> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-          child: Column(
-            children: [
+        child: Column(
+          children: [
                 Container(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                       const SizedBox(height: 24),
-                      const Text(
-                        'MIAWOÉ ZON',
-                        style: TextStyle(
-                          color: Colors.white,
+                    const Text(
+                      'MIAWOÉ ZON',
+                      style: TextStyle(
+                        color: Colors.white,
                           fontSize: 36,
-                          fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                           letterSpacing: 2,
                           shadows: [
                             Shadow(
                               color: Colors.black26,
                               offset: Offset(0, 2),
                               blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                      ),
+                    ),
+                  ],
+                ),
+              ),
                     ],
                   ),
                 ),
@@ -126,7 +126,7 @@ class _ScreenOptionState extends State<ScreenOption> {
                     ],
                   ),
                   padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-                    child: Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Container(
@@ -182,8 +182,8 @@ class _ScreenOptionState extends State<ScreenOption> {
                             elevation: 0,
                           ),
                           child: const Text(
-                            'Se connecter',
-                            style: TextStyle(
+                        'Se connecter',
+                        style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -229,7 +229,7 @@ class _ScreenOptionState extends State<ScreenOption> {
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                             side: const BorderSide(color: Colors.black12),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
+                            borderRadius: BorderRadius.circular(25),
                             ),
                           ),
                           child: Row(
@@ -404,9 +404,9 @@ class _ScreenOptionState extends State<ScreenOption> {
                       borderSide: BorderSide(
                         color: Colors.grey[300]!,
                       ),
-                    ),
-                  ),
-                ),
+                          ),
+                        ),
+                      ),
                 onSelect: (Country country) {
                   setState(() {
                     selectedCountry = country;
@@ -448,6 +448,7 @@ class _ScreenOptionState extends State<ScreenOption> {
               decoration: InputDecoration(
                 hintText: 'Numéro de téléphone',
                 hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF6AAB64)), // Ajout de l'icône de téléphone
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 15),
               ),

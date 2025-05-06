@@ -17,6 +17,25 @@ class AppTheme {
   static const double fontSizeLarge = 18;
   static const double fontSizeXLarge = 20;
 
+  // Style uniforme pour le bouton Google
+  static final ButtonStyle googleButtonStyle = OutlinedButton.styleFrom(
+    backgroundColor: Colors.white,
+    foregroundColor: Colors.black87,
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    side: const BorderSide(color: Colors.black12),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(25),
+    ),
+    elevation: 0,
+  );
+
+  // Style uniforme pour le texte du bouton Google
+  static const TextStyle googleButtonTextStyle = TextStyle(
+    color: Colors.black87,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+  );
+
   static ThemeData get lightTheme => ThemeData(
     primaryColor: primaryColor,
     scaffoldBackgroundColor: backgroundColor,

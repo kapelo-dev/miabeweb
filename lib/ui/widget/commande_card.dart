@@ -34,7 +34,7 @@ class CommandeCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
-            children: [
+          children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -48,49 +48,49 @@ class CommandeCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
+                children: [
+                  Text(
                           commande.codeCommande,
-                          style: const TextStyle(
+                    style: const TextStyle(
                             fontSize: AppTheme.fontSizeNormal,
-                            fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                             color: Colors.black,
-                          ),
-                        ),
-                        Container(
+              ),
+            ),
+            Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 4,
                           ),
-                          decoration: BoxDecoration(
+              decoration: BoxDecoration(
                             color: statusColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
+              ),
+              child: Text(
                             CommandeStatusUtils.formatStatus(commande.statusCommande),
                             style: TextStyle(
                               color: statusColor,
                               fontSize: AppTheme.fontSizeXSmall,
                               fontWeight: FontWeight.w500,
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
+              ),
+            ),
+          ],
+        ),
                     const SizedBox(height: 4),
                     Text(
                       DateFormat('dd/MM/yyyy à HH:mm').format(commande.dateCommande),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+                  ),
+                ),
+                const SizedBox(height: 8),
                     Row(
                       children: [
                         const Icon(
@@ -107,20 +107,20 @@ class CommandeCard extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        Text(
+                            Text(
                           '${commande.montantTotal} FCFA',
                           style: const TextStyle(
                             color: AppTheme.primaryColor,
                             fontSize: AppTheme.fontSizeSmall,
                             fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
+          ),
+        ],
           ),
         ),
       ),
@@ -172,7 +172,7 @@ class CommandeCard extends StatelessWidget {
               Navigator.of(context).pop();
               // Appeler la fonction d'annulation avec l'ID du document
               onCancelOrder(commande.id);
-            }
+    }
           },
         ),
       ),

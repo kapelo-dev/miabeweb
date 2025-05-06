@@ -259,8 +259,8 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
-    await _auth.signOut();
+        await _googleSignIn.signOut();
+      await _auth.signOut();
   }
 
   Future<app_models.User?> getCurrentUser(String userId) async {

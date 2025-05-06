@@ -259,10 +259,10 @@ class ProfileScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -277,42 +277,42 @@ class ProfileScreen extends StatelessWidget {
                               'Êtes-vous sûr de vouloir vous déconnecter ?',
                               style: TextStyle(fontSize: 16),
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
                                 style: TextButton.styleFrom(
                                   foregroundColor: Colors.grey[600],
-                                ),
+                        ),
                                 child: const Text('Annuler'),
-                              ),
+                      ),
                               ElevatedButton(
-                                onPressed: () async {
+                        onPressed: () async {
                                   Navigator.pop(context);
-                                  try {
+                          try {
                                     await authViewModel.signOut();
-                                    Get.snackbar(
-                                      'Succès',
-                                      'Vous avez été déconnecté avec succès',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: Colors.green.withOpacity(0.1),
-                                      colorText: Colors.green,
+                            Get.snackbar(
+                              'Succès',
+                              'Vous avez été déconnecté avec succès',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.green.withOpacity(0.1),
+                              colorText: Colors.green,
+                              duration: const Duration(seconds: 3),
+                                      borderRadius: 12,
+                                      margin: const EdgeInsets.all(16),
+                            );
+                          } catch (e) {
+                            Get.snackbar(
+                              'Erreur',
+                              'Erreur lors de la déconnexion: $e',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red.withOpacity(0.1),
+                              colorText: Colors.red,
                                       duration: const Duration(seconds: 3),
                                       borderRadius: 12,
                                       margin: const EdgeInsets.all(16),
-                                    );
-                                  } catch (e) {
-                                    Get.snackbar(
-                                      'Erreur',
-                                      'Erreur lors de la déconnexion: $e',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: Colors.red.withOpacity(0.1),
-                                      colorText: Colors.red,
-                                      duration: const Duration(seconds: 3),
-                                      borderRadius: 12,
-                                      margin: const EdgeInsets.all(16),
-                                    );
-                                  }
-                                },
+                            );
+                          }
+                        },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red.shade400,
                                   foregroundColor: Colors.white,
@@ -322,11 +322,11 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                 ),
                                 child: const Text('Déconnexion'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                      ),
+                    ],
+                  ),
+                );
+              },
                       icon: Icon(Icons.logout, color: Colors.green.shade400),
                       label: const Text(
                         'Se déconnecter',
@@ -336,12 +336,12 @@ class ProfileScreen extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade400,
-                        foregroundColor: Colors.white,
+                foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         elevation: 0,
-                        shape: RoundedRectangleBorder(
+                shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),

@@ -35,7 +35,7 @@ class CommandeService {
           userCommandes.add(commandeModel);
         }
       }
-
+      
       return userCommandes;
     } catch (e) {
       print('Erreur lors de la récupération des commandes: $e');

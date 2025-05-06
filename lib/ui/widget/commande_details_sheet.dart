@@ -7,6 +7,8 @@ import 'package:miabe_pharmacie/utils/commande_status_utils.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CommandeDetailsSheet extends StatefulWidget {
   final CommandeModel commande;
@@ -412,8 +414,89 @@ class _CommandeDetailsSheetState extends State<CommandeDetailsSheet> {
                     ],
                   ),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    // Implémenter la fonction pour contacter la pharmacie
+                  onPressed: () async {
+                    try {
+                      // Récupérer les informations de la pharmacie
+                      final pharmacieDoc = await FirebaseFirestore.instance
+                          .collection('pharmacies')
+                          .where('nom', isEqualTo: widget.commande.pharmacieNom)
+                          .get();
+
+                      if (pharmacieDoc.docs.isNotEmpty) {
+                        final pharmacieData = pharmacieDoc.docs.first.data();
+                        final telephone1 = pharmacieData['telephone1'] as String?;
+                        final telephone2 = pharmacieData['telephone2'] as String?;
+
+                        if (telephone1?.isNotEmpty == true || telephone2?.isNotEmpty == true) {
+                          // Si nous avons deux numéros, montrer un dialogue de sélection
+                          if (telephone1?.isNotEmpty == true && telephone2?.isNotEmpty == true) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Choisir un numéro'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ListTile(
+                                        leading: const Icon(Icons.phone),
+                                        title: Text(telephone1!),
+                                        onTap: () async {
+                                          Navigator.pop(context);
+                                          final Uri url = Uri.parse('tel:$telephone1');
+                                          if (await canLaunchUrl(url)) {
+                                            await launchUrl(url);
+                                          }
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.phone),
+                                        title: Text(telephone2!),
+                                        onTap: () async {
+                                          Navigator.pop(context);
+                                          final Uri url = Uri.parse('tel:$telephone2');
+                                          if (await canLaunchUrl(url)) {
+                                            await launchUrl(url);
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            // Si nous n'avons qu'un seul numéro, l'appeler directement
+                            final telephone = telephone1 ?? telephone2;
+                            final Uri url = Uri.parse('tel:$telephone');
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url);
+                            }
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Aucun numéro de téléphone disponible pour cette pharmacie'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Impossible de trouver les informations de la pharmacie'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Erreur: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   icon: const Icon(Icons.phone_outlined),
                   label: const Text('Contacter la pharmacie'),

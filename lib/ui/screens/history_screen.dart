@@ -125,7 +125,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               );
 
               if (!order.isHidden) {
-                allOrders.add(order);
+              allOrders.add(order);
               }
             } catch (e) {
               print('Erreur lors du traitement de la commande ${commandeDoc.id}: $e');
@@ -219,18 +219,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
+            ? const Center(
+                child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
-              ),
-            )
-          : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                ),
+              )
+            : _error != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                       Icon(
-                        Icons.error_outline,
+                          Icons.error_outline,
                         size: 64,
                         color: AppTheme.errorColor,
                       ),
@@ -283,7 +283,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -316,9 +316,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     if (_orders.isEmpty)
                       SliverFillRemaining(
                         child: Center(
-                          child: Column(
+          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
+            children: [
                               Icon(
                                 Icons.receipt_long_outlined,
                                 size: 64,
@@ -327,13 +327,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               const SizedBox(height: 16),
                               Text(
                                 'Aucune commande trouvée',
-                                style: TextStyle(
+                                  style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 16,
                                 ),
                               ),
-                            ],
-                          ),
+                          ],
+                        ),
                         ),
                       )
                     else
@@ -346,8 +346,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           childCount: _orders.length,
                         ),
                       ),
-                  ],
-                ),
+                    ],
+                  ),
     );
   }
 
@@ -380,9 +380,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           style: TextStyle(
             fontSize: 12,
             color: Colors.grey[600],
+            ),
           ),
-        ),
-      ],
+        ],
     );
   }
 

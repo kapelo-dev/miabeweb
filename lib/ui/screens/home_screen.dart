@@ -9,6 +9,7 @@ import 'profile_screen.dart';
 import 'package:miabe_pharmacie/services/pharmacie_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:miabe_pharmacie/ui/widgets/pharmacy_details_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -228,7 +229,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
       });
 
       if (filteredPharmacies.isNotEmpty) {
-        _fitMapToPharmacies();
+      _fitMapToPharmacies();
       } else {
         _mapController.move(_currentLocation!, 15.0);
       }
@@ -578,44 +579,16 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
                                     ),
                                     child: GestureDetector(
                                       onTap: () {
-                                        showDialog(
+                                        showModalBottomSheet(
                                           context: context,
-                                          builder: (context) => AlertDialog(
-                                            title: Text(pharmacy['nom']),
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                    'Emplacement: ${pharmacy['emplacement']}'),
-                                                Text(
-                                                    'Téléphone: ${pharmacy['telephone1']}'),
-                                                Text(
-                                                    'Distance: ${pharmacy['distance'].toStringAsFixed(2)} km'),
-                                              ],
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () async {
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (context) => PharmacyDetailsSheet(
+                                            pharmacy: pharmacy,
+                                            onGetDirections: (destination) async {
                                                   Navigator.of(context).pop();
-                                                  await _fetchRoute(LatLng(
-                                                    double.parse(
-                                                        pharmacy['latitude']
-                                                            .toString()),
-                                                    double.parse(
-                                                        pharmacy['longitude']
-                                                            .toString()),
-                                                  ));
+                                              await _fetchRoute(destination);
                                                 },
-                                                child: const Text('Itinéraire'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(),
-                                                child: const Text('Fermer'),
-                                              ),
-                                            ],
                                           ),
                                         );
                                       },
