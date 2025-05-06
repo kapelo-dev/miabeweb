@@ -28,14 +28,30 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Assistant Virtuel MiabéPharmacie',
-          style: TextStyle(color: Colors.white),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Assistant Virtuel',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: _buildChatInterface(),
+            ),
+          ],
         ),
-        backgroundColor: const Color(0xFF6AAB64),
       ),
-      body: _buildChatInterface(),
     );
   }
 

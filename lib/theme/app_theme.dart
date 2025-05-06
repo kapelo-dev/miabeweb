@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   static const Color primaryColor = Color(0xFF6AAB64);
@@ -39,15 +41,26 @@ class AppTheme {
   static ThemeData get lightTheme => ThemeData(
     primaryColor: primaryColor,
     scaffoldBackgroundColor: backgroundColor,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryColor,
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.white,
       elevation: 0,
-      iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(
-        color: Colors.white,
-        fontSize: fontSizeXLarge,
+      iconTheme: const IconThemeData(color: primaryColor),
+      titleTextStyle: const TextStyle(
+        color: textColor,
+        fontSize: fontSizeLarge,
         fontWeight: FontWeight.bold,
       ),
+      toolbarHeight: 70,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(20),
+        ),
+      ),
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      shadowColor: Colors.black.withOpacity(0.1),
+      surfaceTintColor: Colors.white,
+      foregroundColor: primaryColor,
+      centerTitle: true,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(

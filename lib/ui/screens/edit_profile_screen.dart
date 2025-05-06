@@ -44,12 +44,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        title: const Text('Modifier mon profil'),
-        backgroundColor: const Color(0xFF6AAB64),
-        elevation: 0,
-        foregroundColor: Colors.white,
-      ),
       body: Consumer<EditProfileViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
@@ -85,211 +79,226 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _adresseController.text = user.adresse;
           }
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF6AAB64),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.white,
-                        child: Text(
-                          user?.nom?.substring(0, 1).toUpperCase() ?? 'U',
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF6AAB64),
-                          ),
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF6AAB64),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        user?.nom ?? 'Utilisateur',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        user?.email ?? '',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildTextField(
-                          controller: _nomController,
-                          label: 'Nom complet',
-                          icon: Icons.person_outline,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre nom';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                          controller: _emailController,
-                          label: 'Email',
-                          icon: Icons.email_outlined,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre email';
-                            }
-                            if (!value.contains('@')) {
-                              return 'Veuillez entrer un email valide';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                          controller: _telephoneController,
-                          label: 'Téléphone',
-                          icon: Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                          controller: _adresseController,
-                          label: 'Adresse',
-                          icon: Icons.location_on_outlined,
-                        ),
-                        const SizedBox(height: 32),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ChangePasswordScreen(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.lock_outline),
-                          label: const Text('Modifier le mot de passe'),
-                          style: ElevatedButton.styleFrom(
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
                             backgroundColor: Colors.white,
-                            foregroundColor: const Color(0xFF6AAB64),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(color: Color(0xFF6AAB64)),
+                            child: Text(
+                              user?.nom?.substring(0, 1).toUpperCase() ?? 'U',
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF6AAB64),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              final shouldUpdate = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                          const SizedBox(height: 16),
+                          Text(
+                            user?.nom ?? 'Utilisateur',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            user?.email ?? '',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildTextField(
+                              controller: _nomController,
+                              label: 'Nom complet',
+                              icon: Icons.person_outline,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez entrer votre nom';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            _buildTextField(
+                              controller: _emailController,
+                              label: 'Email',
+                              icon: Icons.email_outlined,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez entrer votre email';
+                                }
+                                if (!value.contains('@')) {
+                                  return 'Veuillez entrer un email valide';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            _buildTextField(
+                              controller: _telephoneController,
+                              label: 'Téléphone',
+                              icon: Icons.phone_outlined,
+                              keyboardType: TextInputType.phone,
+                            ),
+                            const SizedBox(height: 20),
+                            _buildTextField(
+                              controller: _adresseController,
+                              label: 'Adresse',
+                              icon: Icons.location_on_outlined,
+                            ),
+                            const SizedBox(height: 32),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ChangePasswordScreen(),
                                   ),
-                                  title: const Text('Confirmation'),
-                                  content: const Text(
-                                    'Voulez-vous enregistrer les modifications ?',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context, false),
-                                      child: const Text('Annuler'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context, true),
-                                      child: const Text(
-                                        'Confirmer',
-                                        style: TextStyle(color: Color(0xFF6AAB64)),
-                                      ),
-                                    ),
-                                  ],
+                                );
+                              },
+                              icon: const Icon(Icons.lock_outline),
+                              label: const Text('Modifier le mot de passe'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFF6AAB64),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: const BorderSide(color: Color(0xFF6AAB64)),
                                 ),
-                              );
-
-                              if (shouldUpdate == true) {
-                                final prefs = await SharedPreferences.getInstance();
-                                final userId = prefs.getString('userId');
-                                if (userId != null) {
-                                  final success = await viewModel.updateUser(
-                                    userId: userId,
-                                    nom: _nomController.text,
-                                    email: _emailController.text,
-                                    telephone: _telephoneController.text,
-                                    adresse: _adresseController.text,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  final shouldUpdate = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      title: const Text('Confirmation'),
+                                      content: const Text(
+                                        'Voulez-vous enregistrer les modifications ?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, false),
+                                          child: const Text('Annuler'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, true),
+                                          child: const Text(
+                                            'Confirmer',
+                                            style: TextStyle(color: Color(0xFF6AAB64)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   );
 
-                                  if (success && mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Profil mis à jour avec succès'),
-                                        backgroundColor: Color(0xFF6AAB64),
-                                        behavior: SnackBarBehavior.floating,
-                                        margin: EdgeInsets.all(16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                                        ),
-                                      ),
-                                    );
-                                    Navigator.pop(context);
-                                  } else if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          viewModel.error ?? 'Erreur lors de la mise à jour',
-                                        ),
-                                        backgroundColor: Colors.red,
-                                        behavior: SnackBarBehavior.floating,
-                                        margin: const EdgeInsets.all(16),
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                                        ),
-                                      ),
-                                    );
+                                  if (shouldUpdate == true) {
+                                    final prefs = await SharedPreferences.getInstance();
+                                    final userId = prefs.getString('userId');
+                                    if (userId != null) {
+                                      final success = await viewModel.updateUser(
+                                        userId: userId,
+                                        nom: _nomController.text,
+                                        email: _emailController.text,
+                                        telephone: _telephoneController.text,
+                                        adresse: _adresseController.text,
+                                      );
+
+                                      if (success && mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Profil mis à jour avec succès'),
+                                            backgroundColor: Color(0xFF6AAB64),
+                                            behavior: SnackBarBehavior.floating,
+                                            margin: EdgeInsets.all(16),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                                            ),
+                                          ),
+                                        );
+                                        Navigator.pop(context);
+                                      } else if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              viewModel.error ?? 'Erreur lors de la mise à jour',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                            behavior: SnackBarBehavior.floating,
+                                            margin: const EdgeInsets.all(16),
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
                                   }
                                 }
-                              }
-                            }
-                          },
-                          icon: const Icon(Icons.save_outlined),
-                          label: const Text('Enregistrer les modifications'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6AAB64),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              },
+                              icon: const Icon(Icons.save_outlined),
+                              label: const Text('Enregistrer les modifications'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF6AAB64),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                top: 40,
+                left: 10,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ],
           );
         },
       ),

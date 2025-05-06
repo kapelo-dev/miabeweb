@@ -185,73 +185,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: AppTheme.primaryColor,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Miabé Pharmacie',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+      body: SafeArea(
+        child: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6AAB64)),
               ),
-            ),
-            Text(
-              'Historique des commandes',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: _loadOrders,
-          ),
-        ],
-      ),
-      body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
-                ),
-              )
-            : _error != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                      Icon(
-                          Icons.error_outline,
-                        size: 64,
-                        color: AppTheme.errorColor,
-                      ),
+            )
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
                       const SizedBox(height: 16),
                       Text(
-                        'Erreur de chargement',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Text(
-                          _error!,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                        ),
+                        _error!,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
@@ -265,89 +216,127 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
+                          ),
+                        ),
                         icon: const Icon(Icons.refresh),
                         label: const Text('Réessayer'),
                       ),
                     ],
                   ),
                 )
-              : CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+              : Stack(
+                  children: [
+                    CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
                           child: Padding(
-              padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.fromLTRB(60, 20, 20, 10),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                _buildStatItem(
-                                  enCoursCount.toString(),
-                                  'En cours',
-                                  Icons.hourglass_empty,
-                                  AppTheme.warningColor,
-                                        ),
-                                _buildDivider(),
-                                _buildStatItem(
-                                  valideesCount.toString(),
-                                  'Validées',
-                                  Icons.check_circle_outline,
-                                  AppTheme.successColor,
-                                            ),
-                                _buildDivider(),
-                                _buildStatItem(
-                                  totalCount.toString(),
-                                  'Total',
-                                  Icons.shopping_bag_outlined,
-                                  const Color.fromARGB(255, 13, 151, 190),
+                                const Text(
+                                  'Historique des commandes',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.refresh, color: Colors.black),
+                                  onPressed: _loadOrders,
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    if (_orders.isEmpty)
-                      SliverFillRemaining(
-                        child: Center(
-          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-                              Icon(
-                                Icons.receipt_long_outlined,
-                                size: 64,
-                                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 16),
-                              Text(
-                                'Aucune commande trouvée',
-                                  style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 16,
+                        SliverToBoxAdapter(
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    _buildStatItem(
+                                      enCoursCount.toString(),
+                                      'En cours',
+                                      Icons.hourglass_empty,
+                                      AppTheme.warningColor,
+                                    ),
+                                    _buildDivider(),
+                                    _buildStatItem(
+                                      valideesCount.toString(),
+                                      'Validées',
+                                      Icons.check_circle_outline,
+                                      AppTheme.successColor,
+                                    ),
+                                    _buildDivider(),
+                                    _buildStatItem(
+                                      totalCount.toString(),
+                                      'Total',
+                                      Icons.shopping_bag_outlined,
+                                      const Color.fromARGB(255, 13, 151, 190),
+                                    ),
+                                  ],
                                 ),
                               ),
-                          ],
-                        ),
-                        ),
-                      )
-                    else
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => HistoryCard(
-                            order: _orders[index],
-                            onHideOrder: _hideOrder,
+                            ),
                           ),
-                          childCount: _orders.length,
                         ),
+                        if (_orders.isEmpty)
+                          SliverFillRemaining(
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.receipt_long_outlined,
+                                    size: 64,
+                                    color: Colors.grey[400],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Aucune commande trouvée',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => HistoryCard(
+                                order: _orders[index],
+                                onHideOrder: _hideOrder,
+                              ),
+                              childCount: _orders.length,
+                            ),
+                          ),
+                      ],
+                    ),
+                    Positioned(
+                      top: 20,
+                      left: 10,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Colors.black,
+                        ),
+                        onPressed: () => Navigator.pop(context),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+      ),
     );
   }
 
@@ -380,9 +369,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           style: TextStyle(
             fontSize: 12,
             color: Colors.grey[600],
-            ),
           ),
-        ],
+        ),
+      ],
     );
   }
 

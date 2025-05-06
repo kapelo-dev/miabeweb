@@ -39,17 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF6AAB64),
-        title: GestureDetector(
-          onTap: _loadPharmacies,
-          child: const Text(
-            'Miabé pharmacie',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        elevation: 0,
-      ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: Container(
         height: 55,
@@ -488,65 +477,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Produit Spécifique',
-              hintStyle: TextStyle(color: Colors.grey.shade400),
-              suffixIcon: const Icon(Icons.search, color: Colors.grey),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: Colors.grey.shade200,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _fetchNearbyPharmacies,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isGardeActive
-                        ? Colors.grey.shade400
-                        : const Color(0xFF6AAB64),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    'Pharmacie Ouverte',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _fetchGardePharmacies,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isGardeActive
-                        ? const Color(0xFF6AAB64)
-                        : Colors.grey.shade400,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    'Pharmacie de Garde',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
         Expanded(
           child: Stack(
             children: [
@@ -597,9 +527,9 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
                                           builder: (context) => PharmacyDetailsSheet(
                                             pharmacy: pharmacy,
                                             onGetDirections: (destination) async {
-                                                  Navigator.of(context).pop();
+                                              Navigator.of(context).pop();
                                               await _fetchRoute(destination);
-                                                },
+                                            },
                                           ),
                                         );
                                       },
@@ -627,19 +557,84 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
                         ),
               if (_errorMessage != null)
                 Positioned(
-                  top: 10,
+                  top: 90,
                   left: 10,
                   right: 10,
                   child: Container(
-                    padding: const EdgeInsets.all(10),
-                    color: Colors.black.withOpacity(0.7),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: const TextStyle(
+                        color: Colors.white, 
+                        fontSize: 16,
+                        height: 1.3,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ),
+              Positioned(
+                top: 20,
+                left: 20,
+                right: 20,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _fetchNearbyPharmacies,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isGardeActive
+                              ? Colors.white.withOpacity(0.8)
+                              : const Color(0xFF6AAB64).withOpacity(0.9),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: Text(
+                          'Pharmacies Ouvertes',
+                          style: TextStyle(
+                            color: _isGardeActive
+                                ? Colors.grey.shade700
+                                : Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _fetchGardePharmacies,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isGardeActive
+                              ? const Color(0xFF6AAB64).withOpacity(0.9)
+                              : Colors.white.withOpacity(0.8),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: Text(
+                          'Pharmacies de Garde',
+                          style: TextStyle(
+                            color: _isGardeActive
+                                ? Colors.white
+                                : Colors.grey.shade700,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

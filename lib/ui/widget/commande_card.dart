@@ -19,6 +19,13 @@ class CommandeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusColor = CommandeStatusUtils.getStatusColor(commande.statusCommande);
     
+    String _formatCodeCommande(String code) {
+      if (code.length > 8) {
+        return '${code.substring(0, 8)}...';
+      }
+      return code;
+    }
+    
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       shape: RoundedRectangleBorder(
@@ -56,7 +63,7 @@ class CommandeCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                          commande.codeCommande,
+                          _formatCodeCommande(commande.codeCommande),
                     style: const TextStyle(
                             fontSize: AppTheme.fontSizeNormal,
                       fontWeight: FontWeight.bold,
