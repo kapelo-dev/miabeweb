@@ -114,7 +114,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(color: Color(0xFF6AAB64)),
-                              ),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -151,7 +151,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(color: Color(0xFF6AAB64)),
-                              ),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -191,7 +191,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(color: Color(0xFF6AAB64)),
-                              ),
+                      ),
                     ),
                     validator: (value) {
                               if (value == null || value.isEmpty) {

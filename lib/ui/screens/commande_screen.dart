@@ -32,46 +32,46 @@ class CommandeScreen extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  IconButton(
+          IconButton(
                     icon: const Icon(Icons.refresh, color: Colors.black),
-                    onPressed: () => _viewModel.refreshCommandes(),
-                  ),
-                ],
-              ),
+            onPressed: () => _viewModel.refreshCommandes(),
+          ),
+        ],
+      ),
             ),
             const Divider(height: 1),
             Expanded(
               child: Obx(() {
-                if (_viewModel.isLoading.value) {
+        if (_viewModel.isLoading.value) {
                   return const Center(
                     child: CircularProgressIndicator(
                       color: AppTheme.primaryColor,
                     ),
                   );
-                }
+        }
 
-                if (_viewModel.error.isNotEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+        if (_viewModel.error.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                         Icon(
                           Icons.error_outline,
                           size: 64,
                           color: AppTheme.errorColor,
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          _viewModel.error.value,
+                Text(
+                  _viewModel.error.value,
                           style: TextStyle(
                             color: AppTheme.errorColor,
                             fontSize: 16,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
+                  textAlign: TextAlign.center,
+                ),
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
-                          onPressed: _viewModel.refreshCommandes,
+                  onPressed: _viewModel.refreshCommandes,
                           icon: const Icon(Icons.refresh),
                           label: const Text('Réessayer'),
                           style: ElevatedButton.styleFrom(
@@ -82,11 +82,11 @@ class CommandeScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
+                ),
+              ],
+            ),
+          );
+        }
 
                 return CustomScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -170,7 +170,7 @@ class CommandeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'Aucune commande trouvée',
+              'Aucune commande trouvée',
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 16,
@@ -184,48 +184,48 @@ class CommandeScreen extends StatelessWidget {
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            final commande = _viewModel.commandes[index];
+              final commande = _viewModel.commandes[index];
                             return Hero(
                               tag: 'commande_${commande.id}',
                               child: CommandeCard(
-                                commande: commande,
-                                onCancelOrder: (commandeId) async {
-                                  try {
-                                    await _viewModel.updateCommandeStatus(
-                                      commande.pharmacieId,
-                                      commandeId,
-                                      'annulée',
-                                    );
-                                    Get.snackbar(
-                                      'Succès',
-                                      'La commande a été annulée avec succès',
+                commande: commande,
+                onCancelOrder: (commandeId) async {
+                  try {
+                    await _viewModel.updateCommandeStatus(
+                      commande.pharmacieId,
+                      commandeId,
+                      'annulée',
+                    );
+                    Get.snackbar(
+                      'Succès',
+                      'La commande a été annulée avec succès',
                                       backgroundColor: AppTheme.successColor,
-                                      colorText: Colors.white,
+                      colorText: Colors.white,
                                       snackPosition: SnackPosition.TOP,
                                       margin: const EdgeInsets.all(16),
                                       borderRadius: 12,
-                                    );
-                                  } catch (e) {
-                                    Get.snackbar(
-                                      'Erreur',
-                                      'Impossible d\'annuler la commande',
+                    );
+                  } catch (e) {
+                    Get.snackbar(
+                      'Erreur',
+                      'Impossible d\'annuler la commande',
                                       backgroundColor: AppTheme.errorColor,
-                                      colorText: Colors.white,
+                      colorText: Colors.white,
                                       snackPosition: SnackPosition.TOP,
                                       margin: const EdgeInsets.all(16),
                                       borderRadius: 12,
-                                    );
-                                  }
-                                },
+                    );
+                  }
+                },
                               ),
-                            );
-                          },
+              );
+            },
                           childCount: _viewModel.commandes.length,
                         ),
-                      ),
+          ),
                   ],
-                );
-              }),
+        );
+      }),
             ),
           ],
         ),
@@ -236,34 +236,34 @@ class CommandeScreen extends StatelessWidget {
   Widget _buildStatItem(String count, String label, IconData icon, Color color) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
+              children: [
+                Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
+                  decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
           child: Icon(icon, color: color, size: 24),
-        ),
-        const SizedBox(height: 8),
-        Text(
+            ),
+            const SizedBox(height: 8),
+            Text(
           count,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: color,
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
+            ),
+            const SizedBox(height: 4),
+            Text(
           label,
-          style: TextStyle(
+                            style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
             color: color.withOpacity(0.8),
-          ),
-        ),
-      ],
+                          ),
+                        ),
+                    ],
     );
   }
 

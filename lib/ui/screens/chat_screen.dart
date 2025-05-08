@@ -42,7 +42,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
-                ),
+        ),
               ),
             ),
             const Divider(height: 1),

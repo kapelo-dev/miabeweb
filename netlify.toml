@@ -1,0 +1,16 @@
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build]
+  command = "flutter build web --release"
+  publish = "build/web"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Content-Security-Policy = "default-src 'self' https: 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'self' https: wss: ws:; img-src 'self' https: data: blob:; frame-src 'self' https:;" 

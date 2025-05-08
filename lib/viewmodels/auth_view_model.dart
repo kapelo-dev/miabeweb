@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../services/auth_service.dart';
 import '../models/user.dart' as app_models;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 
 class AuthViewModel extends GetxController {
   final AuthService _authService;
@@ -48,13 +49,36 @@ class AuthViewModel extends GetxController {
       email: email,
       password: password,
       onCodeSent: (verificationId, otpCode) {
-        Get.snackbar('Code OTP envoyé', 'Votre code est : $otpCode',
-            duration: const Duration(seconds: 10));
+        Get.snackbar(
+          'Code OTP envoyé',
+          'Votre code est : $otpCode',
+          duration: const Duration(seconds: 10),
+          backgroundColor: Colors.white,
+          colorText: Colors.black87,
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: 8,
+          boxShadows: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            )
+          ]
+        );
         Get.toNamed('/otp', arguments: verificationId);
       },
       onError: (message) {
         error.value = message;
-        Get.snackbar('Erreur', message);
+        Get.snackbar(
+          'Erreur',
+          message,
+          backgroundColor: Colors.red[100],
+          colorText: Colors.red[900],
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: 8
+        );
         _isOtpSent.value = false;
       },
     );
@@ -71,13 +95,36 @@ class AuthViewModel extends GetxController {
       phoneNumber: phoneNumber,
       password: password,
       onCodeSent: (verificationId, otpCode) {
-        Get.snackbar('Code OTP envoyé', 'Votre code est : $otpCode',
-            duration: const Duration(seconds: 10));
+        Get.snackbar(
+          'Code OTP envoyé',
+          'Votre code est : $otpCode',
+          duration: const Duration(seconds: 10),
+          backgroundColor: Colors.white,
+          colorText: Colors.black87,
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: 8,
+          boxShadows: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            )
+          ]
+        );
         Get.toNamed('/otp', arguments: verificationId);
       },
       onError: (message) {
         error.value = message;
-        Get.snackbar('Erreur', message);
+        Get.snackbar(
+          'Erreur',
+          message,
+          backgroundColor: Colors.red[100],
+          colorText: Colors.red[900],
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: 8
+        );
         _isOtpSent.value = false;
       },
     );
@@ -121,13 +168,36 @@ class AuthViewModel extends GetxController {
       password: password,
       name: name,
       onCodeSent: (verificationId, otpCode) {
-        Get.snackbar('Code OTP envoyé', 'Votre code est : $otpCode',
-            duration: const Duration(seconds: 10));
+        Get.snackbar(
+          'Code OTP envoyé',
+          'Votre code est : $otpCode',
+          duration: const Duration(seconds: 10),
+          backgroundColor: Colors.white,
+          colorText: Colors.black87,
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: 8,
+          boxShadows: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            )
+          ]
+        );
         Get.toNamed('/otp', arguments: verificationId);
       },
       onError: (message) {
         error.value = message;
-        Get.snackbar('Erreur', message);
+        Get.snackbar(
+          'Erreur',
+          message,
+          backgroundColor: Colors.red[100],
+          colorText: Colors.red[900],
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: 8
+        );
         _isOtpSent.value = false;
       },
     );
@@ -162,12 +232,28 @@ class AuthViewModel extends GetxController {
         Get.offAllNamed('/home');
         _isOtpSent.value = false;
       } else {
-        Get.snackbar('Erreur', 'Code OTP incorrect');
+        Get.snackbar(
+          'Erreur',
+          'Code OTP incorrect',
+          backgroundColor: Colors.red[100],
+          colorText: Colors.red[900],
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: 8
+        );
       }
       return success;
     } catch (e) {
       error.value = e.toString();
-      Get.snackbar('Erreur', e.toString());
+      Get.snackbar(
+        'Erreur',
+        e.toString(),
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(8),
+        borderRadius: 8
+      );
       return false;
     } finally {
       isLoading.value = false;
@@ -181,7 +267,15 @@ class AuthViewModel extends GetxController {
       Get.offAllNamed('/');
     } catch (e) {
       error.value = 'Erreur lors de la déconnexion: $e';
-      Get.snackbar('Erreur', error.value);
+      Get.snackbar(
+        'Erreur',
+        error.value,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(8),
+        borderRadius: 8
+      );
     }
   }
 }

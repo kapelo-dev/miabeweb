@@ -18,22 +18,34 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-  <!-- Google Sign-in Client ID -->
-  <meta name="google-signin-client_id" content="501841860383-bps152c6aja38d1gmp68q8leaapoouci.apps.googleusercontent.com">
+  <meta name="description" content="Application mobile Miabé Pharmacie">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="miabe_pharmacie">
+  <meta name="apple-mobile-web-app-title" content="Miabé Pharmacie">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>miabe_pharmacie</title>
+  <title>Miabé Pharmacie</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- Google Sign-in -->
+  <meta name="google-signin-client_id" content="501841860383-bps152c6aja38d1gmp68q8leaapoouci.apps.googleusercontent.com">
+  
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '501841860383',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v18.0'
+      });
+    };
+  </script>
+  
   <script>
     // The value below is injected by flutter build, do not touch.
     const serviceWorkerVersion = null;
@@ -56,6 +68,43 @@
         }
       });
     });
+  </script>
+  
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDeEupTd2IrWdnBlBv1anZP2nxNJ8zky4U",
+      authDomain: "miabe-pharmacie.firebaseapp.com",
+      projectId: "miabe-pharmacie",
+      storageBucket: "miabe-pharmacie.firebasestorage.app",
+      messagingSenderId: "501841860383",
+      appId: "1:501841860383:web:2e8d26fbf5bc8de5b8022a"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Configuration des URLs autorisées pour l'authentification
+    const auth = firebase.auth();
+    auth.useDeviceLanguage();
+    
+    // Configuration des providers
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    googleProvider.setCustomParameters({
+      'login_hint': 'user@example.com',
+      'prompt': 'select_account'
+    });
+
+    // Ajout des domaines autorisés
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    const allowedDomains = [
+      'https://miabepharmacie.netlify.app',
+      'http://localhost:3000',
+      'http://localhost'
+    ];
   </script>
 </body>
 </html>

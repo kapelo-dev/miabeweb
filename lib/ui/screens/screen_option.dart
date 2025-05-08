@@ -169,6 +169,12 @@ class _ScreenOptionState extends State<ScreenOption> {
                       const SizedBox(height: 20),
                       _buildPasswordField(),
                       const SizedBox(height: 24),
+                      Image.asset(
+                        AppTheme.getLogoPath(context),
+                        height: 120,
+                        width: 120,
+                      ),
+                      const SizedBox(height: 24),
                       Center(
                         child: ElevatedButton(
                           onPressed: _handleLogin,

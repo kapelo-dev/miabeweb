@@ -10,6 +10,7 @@ class AppTheme {
   static const Color successColor = Color(0xFF66BB6A);
   static const Color textColor = Color(0xFF333333);
   static const Color secondaryTextColor = Color(0xFF757575);
+  static const Color secondaryColor = Color(0xFF4CAF50);
 
   // Tailles de police standardisées
   static const double fontSizeXSmall = 10;
@@ -40,9 +41,13 @@ class AppTheme {
 
   static ThemeData get lightTheme => ThemeData(
     primaryColor: primaryColor,
+    colorScheme: ColorScheme.light(
+      primary: primaryColor,
+      secondary: secondaryColor,
+    ),
     scaffoldBackgroundColor: backgroundColor,
     appBarTheme: AppBarTheme(
-      backgroundColor: Colors.white,
+      backgroundColor: primaryColor,
       elevation: 0,
       iconTheme: const IconThemeData(color: primaryColor),
       titleTextStyle: const TextStyle(
@@ -106,6 +111,26 @@ class AppTheme {
       ),
     ),
   );
+
+  static ThemeData get darkTheme => ThemeData(
+    primaryColor: primaryColor,
+    colorScheme: ColorScheme.dark(
+      primary: primaryColor,
+      secondary: secondaryColor,
+    ),
+    scaffoldBackgroundColor: Colors.black,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.black,
+      elevation: 0,
+    ),
+  );
+
+  static String getLogoPath(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    return brightness == Brightness.dark
+        ? 'assets/images/logo-blanc.png'
+        : 'assets/images/logo-noir.png';
+  }
 
   // Pour la rétrocompatibilité
   static ThemeData get theme => lightTheme;

@@ -17,6 +17,23 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class ResponsiveLayout {
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width < 600;
+
+  static bool isTablet(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 1200;
+
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 1200;
+
+  static double getScreenWidth(BuildContext context) =>
+      MediaQuery.of(context).size.width;
+
+  static double getScreenHeight(BuildContext context) =>
+      MediaQuery.of(context).size.height;
+}
+
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
@@ -37,19 +54,70 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = ResponsiveLayout.getScreenWidth(context);
+    final screenHeight = ResponsiveLayout.getScreenHeight(context);
+    final isDesktop = ResponsiveLayout.isDesktop(context);
+    final isTablet = ResponsiveLayout.isTablet(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: Container(
-        height: 55,
+      body: SafeArea(
+        child: Container(
+          width: screenWidth,
+          height: screenHeight,
+          color: Colors.white,
+          child: Row(
+            children: [
+              if (isDesktop)
+                Container(
+                  width: 250,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildDesktopNavItem(0, 'Pharmacies', Icons.local_pharmacy),
+                      _buildDesktopNavItem(1, 'Assistant', Icons.support_agent),
+                      _buildDesktopNavItem(2, 'Commandes', Icons.local_hospital),
+                      _buildDesktopNavItem(3, 'Profil', Icons.person),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: _screens[_selectedIndex],
+              ),
+            ],
+          ),
+        ),
+      ),
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      bottomNavigationBar: !isDesktop ? Container(
+        height: isTablet ? 75 : 65,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).padding.bottom + (isTablet ? 16.0 : 8.0),
+          left: isTablet ? 32.0 : 16.0,
+          right: isTablet ? 32.0 : 16.0,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(
-            top: BorderSide(
-              color: Colors.grey.shade300,
-              width: 0.5,
+          borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -59,6 +127,43 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildNavItem(2, 'Commandes', Icons.local_hospital),
             _buildNavItem(3, 'Profil', Icons.person),
           ],
+        ),
+      ) : null,
+    );
+  }
+
+  Widget _buildDesktopNavItem(int index, String label, IconData icon) {
+    final isSelected = _selectedIndex == index;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Material(
+        color: isSelected ? const Color(0xFF6AAB64).withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => setState(() => _selectedIndex = index),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? const Color(0xFF6AAB64) : Colors.grey,
+                  size: 24,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? const Color(0xFF6AAB64) : Colors.grey,
+                    fontSize: 16,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -110,6 +215,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
   bool _isLoading = true;
   bool _isGardeActive = false;
   String? _errorMessage;
+  bool _isMapInitialized = false;
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
@@ -133,6 +240,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
   }
 
   Future<void> _startInitialization() async {
+    if (!_isFirstLoad) return;
     try {
       await _initializeLocation();
     } catch (e) {
@@ -142,7 +250,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
   }
 
   Future<void> _initializeLocation() async {
-    if (!mounted) return;
+    if (!mounted || !_isFirstLoad) return;
     
     setState(() {
       _isLoading = true;
@@ -172,28 +280,43 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
 
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
+        _isLoading = false;
+        _isFirstLoad = false;
       });
-
-      _mapController.move(_currentLocation!, 15.0);
-      
-      await _fetchNearbyPharmacies();
 
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
         _errorMessage = 'Erreur de localisation : $e';
+        _isFirstLoad = false;
       });
       _showError(_errorMessage!);
     }
   }
 
+  void _onMapCreated(MapController controller) {
+    if (_isMapInitialized) return;
+    
+    _isMapInitialized = true;
+    if (_currentLocation != null) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          controller.move(_currentLocation!, 15.0);
+          _fetchNearbyPharmacies();
+        }
+      });
+    }
+  }
+
   Future<void> _fetchNearbyPharmacies() async {
-    if (_currentLocation == null) {
+    if (_currentLocation == null || !mounted) {
       _showError('Position non disponible. Veuillez réessayer.');
       setState(() => _isLoading = false);
       return;
     }
+
+    if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
@@ -228,10 +351,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
         }
       });
 
-      if (filteredPharmacies.isNotEmpty) {
-      _fitMapToPharmacies();
-      } else {
-        _mapController.move(_currentLocation!, 15.0);
+      if (filteredPharmacies.isNotEmpty && _isMapInitialized) {
+        _fitMapToPharmacies();
       }
 
     } catch (e) {
@@ -245,10 +366,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
       });
 
       _showError(_errorMessage!);
-      
-      if (_currentLocation != null) {
-        _mapController.move(_currentLocation!, 15.0);
-      }
     }
   }
 
@@ -475,170 +592,190 @@ class _HomeScreenContentState extends State<HomeScreenContent> with WidgetsBindi
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Stack(
-            children: [
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _currentLocation == null
-                      ? const Center(child: Text('Localisation non disponible'))
-                      : FlutterMap(
-                          mapController: _mapController,
-                          options: MapOptions(
-                            initialCenter: _currentLocation!,
-                            initialZoom: 15.0,
+    final isDesktop = ResponsiveLayout.isDesktop(context);
+    final isTablet = ResponsiveLayout.isTablet(context);
+    final padding = MediaQuery.of(context).padding;
+    
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          Expanded(
+            child: Stack(
+              children: [
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _currentLocation == null
+                        ? const Center(child: Text('Localisation non disponible'))
+                        : FlutterMap(
+                            mapController: _mapController,
+                            options: MapOptions(
+                              initialCenter: _currentLocation!,
+                              initialZoom: isDesktop ? 13.0 : 15.0,
+                              onMapReady: () {
+                                _onMapCreated(_mapController);
+                              },
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate:
+                                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                subdomains: const ['a', 'b', 'c'],
+                              ),
+                              MarkerLayer(
+                                markers: _buildMarkers(context),
+                              ),
+                              PolylineLayer(
+                                polylines: [
+                                  if (_route.isNotEmpty)
+                                    Polyline(
+                                      points: _route,
+                                      strokeWidth: isDesktop ? 6.0 : 4.0,
+                                      color: Colors.red,
+                                    ),
+                                ],
+                              ),
+                            ],
                           ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              subdomains: const ['a', 'b', 'c'],
-                            ),
-                            MarkerLayer(
-                              markers: [
-                                Marker(
-                                  width: 80.0,
-                                  height: 80.0,
-                                  point: _currentLocation!,
-                                  child: const Icon(
-                                    Icons.location_on,
-                                    color: Colors.blue,
-                                    size: 40.0,
-                                  ),
-                                ),
-                                ..._nearbyPharmacies.map(
-                                  (pharmacy) => Marker(
-                                    width: 80.0,
-                                    height: 80.0,
-                                    point: LatLng(
-                                      double.parse(
-                                          pharmacy['latitude'].toString()),
-                                      double.parse(
-                                          pharmacy['longitude'].toString()),
-                                    ),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          isScrollControlled: true,
-                                          backgroundColor: Colors.transparent,
-                                          builder: (context) => PharmacyDetailsSheet(
-                                            pharmacy: pharmacy,
-                                            onGetDirections: (destination) async {
-                                              Navigator.of(context).pop();
-                                              await _fetchRoute(destination);
-                                            },
-                                          ),
-                                        );
-                                      },
-                                      child: const Icon(
-                                        Icons.local_pharmacy,
-                                        color: Colors.green,
-                                        size: 40.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            PolylineLayer(
-                              polylines: [
-                                if (_route.isNotEmpty)
-                                  Polyline(
-                                    points: _route,
-                                    strokeWidth: 4.0,
-                                    color: Colors.red,
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-              if (_errorMessage != null)
-                Positioned(
-                  top: 90,
-                  left: 10,
-                  right: 10,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      _errorMessage!,
-                      style: const TextStyle(
-                        color: Colors.white, 
-                        fontSize: 16,
-                        height: 1.3,
+                if (_errorMessage != null)
+                  Positioned(
+                    top: isDesktop ? 120 : (90 + padding.top),
+                    left: isDesktop ? 270 : 10,
+                    right: 10,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: isDesktop ? 16 : 12,
+                        horizontal: isDesktop ? 24 : 16
                       ),
-                      textAlign: TextAlign.center,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
+                      ),
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isDesktop ? 18 : 16,
+                          height: 1.3,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
-                ),
-              Positioned(
-                top: 20,
-                left: 20,
-                right: 20,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _fetchNearbyPharmacies,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _isGardeActive
-                              ? Colors.white.withOpacity(0.8)
-                              : const Color(0xFF6AAB64).withOpacity(0.9),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: Text(
+                Positioned(
+                  top: isDesktop ? 40 : (20 + padding.top),
+                  left: isDesktop ? 270 : 20,
+                  right: 20,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildFilterButton(
                           'Pharmacies Ouvertes',
-                          style: TextStyle(
-                            color: _isGardeActive
-                                ? Colors.grey.shade700
-                                : Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          _fetchNearbyPharmacies,
+                          !_isGardeActive,
+                          isDesktop,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _fetchGardePharmacies,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _isGardeActive
-                              ? const Color(0xFF6AAB64).withOpacity(0.9)
-                              : Colors.white.withOpacity(0.8),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: Text(
+                      SizedBox(width: isDesktop ? 16 : 10),
+                      Expanded(
+                        child: _buildFilterButton(
                           'Pharmacies de Garde',
-                          style: TextStyle(
-                            color: _isGardeActive
-                                ? Colors.white
-                                : Colors.grey.shade700,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          _fetchGardePharmacies,
+                          _isGardeActive,
+                          isDesktop,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Marker> _buildMarkers(BuildContext context) {
+    final isDesktop = ResponsiveLayout.isDesktop(context);
+    final markers = <Marker>[];
+
+    // Marqueur de position actuelle
+    if (_currentLocation != null) {
+      markers.add(
+        Marker(
+          width: isDesktop ? 100.0 : 80.0,
+          height: isDesktop ? 100.0 : 80.0,
+          point: _currentLocation!,
+          child: Icon(
+            Icons.location_on,
+            color: Colors.blue,
+            size: isDesktop ? 50.0 : 40.0,
           ),
         ),
-      ],
+      );
+    }
+
+    // Marqueurs des pharmacies
+    markers.addAll(_nearbyPharmacies.map(
+      (pharmacy) => Marker(
+        width: isDesktop ? 100.0 : 80.0,
+        height: isDesktop ? 100.0 : 80.0,
+        point: LatLng(
+          double.parse(pharmacy['latitude'].toString()),
+          double.parse(pharmacy['longitude'].toString()),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => PharmacyDetailsSheet(
+                pharmacy: pharmacy,
+                onGetDirections: (destination) async {
+                  Navigator.of(context).pop();
+                  await _fetchRoute(destination);
+                },
+              ),
+            );
+          },
+          child: Icon(
+            Icons.local_pharmacy,
+            color: Colors.green,
+            size: isDesktop ? 50.0 : 40.0,
+          ),
+        ),
+      ),
+    ));
+
+    return markers;
+  }
+
+  Widget _buildFilterButton(String text, VoidCallback onPressed, bool isActive, bool isDesktop) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isActive
+            ? const Color(0xFF6AAB64).withOpacity(0.9)
+            : Colors.white.withOpacity(0.8),
+        elevation: 0,
+        padding: EdgeInsets.symmetric(
+          vertical: isDesktop ? 16 : 12,
+          horizontal: isDesktop ? 24 : 16,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(isDesktop ? 16 : 30),
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: isActive ? Colors.white : Colors.grey.shade700,
+          fontWeight: FontWeight.w600,
+          fontSize: isDesktop ? 16 : 14,
+        ),
+      ),
     );
   }
 }

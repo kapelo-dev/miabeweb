@@ -129,117 +129,117 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(20),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                             _buildTextField(
-                              controller: _nomController,
+                    controller: _nomController,
                               label: 'Nom complet',
                               icon: Icons.person_outline,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Veuillez entrer votre nom';
-                                }
-                                return null;
-                              },
-                            ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer votre nom';
+                      }
+                      return null;
+                    },
+                  ),
                             const SizedBox(height: 20),
                             _buildTextField(
-                              controller: _emailController,
+                    controller: _emailController,
                               label: 'Email',
                               icon: Icons.email_outlined,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Veuillez entrer votre email';
-                                }
-                                if (!value.contains('@')) {
-                                  return 'Veuillez entrer un email valide';
-                                }
-                                return null;
-                              },
-                            ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer votre email';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Veuillez entrer un email valide';
+                      }
+                      return null;
+                    },
+                  ),
                             const SizedBox(height: 20),
                             _buildTextField(
-                              controller: _telephoneController,
+                    controller: _telephoneController,
                               label: 'Téléphone',
                               icon: Icons.phone_outlined,
                               keyboardType: TextInputType.phone,
                             ),
                             const SizedBox(height: 20),
                             _buildTextField(
-                              controller: _adresseController,
+                    controller: _adresseController,
                               label: 'Adresse',
                               icon: Icons.location_on_outlined,
                             ),
                             const SizedBox(height: 32),
                             ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ChangePasswordScreen(),
-                                  ),
-                                );
-                              },
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChangePasswordScreen(),
+                        ),
+                      );
+                    },
                               icon: const Icon(Icons.lock_outline),
                               label: const Text('Modifier le mot de passe'),
-                              style: ElevatedButton.styleFrom(
+                    style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF6AAB64),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: const BorderSide(color: Color(0xFF6AAB64)),
                                 ),
                               ),
-                            ),
+                    ),
                             const SizedBox(height: 16),
                             ElevatedButton.icon(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  final shouldUpdate = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        final shouldUpdate = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      title: const Text('Confirmation'),
-                                      content: const Text(
+                            title: const Text('Confirmation'),
+                            content: const Text(
                                         'Voulez-vous enregistrer les modifications ?',
                                       ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, false),
-                                          child: const Text('Annuler'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, true),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Annuler'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
                                           child: const Text(
                                             'Confirmer',
                                             style: TextStyle(color: Color(0xFF6AAB64)),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                              ),
+                            ],
+                          ),
+                        );
 
-                                  if (shouldUpdate == true) {
-                                    final prefs = await SharedPreferences.getInstance();
-                                    final userId = prefs.getString('userId');
-                                    if (userId != null) {
-                                      final success = await viewModel.updateUser(
-                                        userId: userId,
-                                        nom: _nomController.text,
-                                        email: _emailController.text,
-                                        telephone: _telephoneController.text,
-                                        adresse: _adresseController.text,
-                                      );
+                        if (shouldUpdate == true) {
+                          final prefs = await SharedPreferences.getInstance();
+                          final userId = prefs.getString('userId');
+                          if (userId != null) {
+                            final success = await viewModel.updateUser(
+                              userId: userId,
+                              nom: _nomController.text,
+                              email: _emailController.text,
+                              telephone: _telephoneController.text,
+                              adresse: _adresseController.text,
+                            );
 
-                                      if (success && mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
+                            if (success && mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
                                             content: Text('Profil mis à jour avec succès'),
                                             backgroundColor: Color(0xFF6AAB64),
                                             behavior: SnackBarBehavior.floating,
@@ -247,28 +247,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(Radius.circular(12)),
                                             ),
-                                          ),
-                                        );
-                                        Navigator.pop(context);
-                                      } else if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
+                                ),
+                              );
+                              Navigator.pop(context);
+                            } else if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
                                             content: Text(
                                               viewModel.error ?? 'Erreur lors de la mise à jour',
                                             ),
-                                            backgroundColor: Colors.red,
+                                  backgroundColor: Colors.red,
                                             behavior: SnackBarBehavior.floating,
                                             margin: const EdgeInsets.all(16),
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(Radius.circular(12)),
                                             ),
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  }
-                                }
-                              },
+                                ),
+                              );
+                            }
+                          }
+                        }
+                      }
+                    },
                               icon: const Icon(Icons.save_outlined),
                               label: const Text('Enregistrer les modifications'),
                               style: ElevatedButton.styleFrom(
@@ -283,10 +283,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
               Positioned(
                 top: 40,
                 left: 10,

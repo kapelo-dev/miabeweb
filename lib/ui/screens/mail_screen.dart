@@ -130,7 +130,7 @@ class MailScreen extends StatelessWidget {
                             ],
                           ),
                           child: TextFormField(
-                            controller: passwordController,
+                        controller: passwordController,
                         obscureText: true,
                             decoration: InputDecoration(
                               hintText: "Entrez votre mot de passe",
@@ -169,7 +169,7 @@ class MailScreen extends StatelessWidget {
                         const SizedBox(height: 20),
                         Center(
                           child: OutlinedButton(
-                            onPressed: () => authViewModel.signInWithGoogle(),
+                        onPressed: () => authViewModel.signInWithGoogle(),
                             style: AppTheme.googleButtonStyle,
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -177,7 +177,7 @@ class MailScreen extends StatelessWidget {
                                 Image.asset(
                                   'assets/images/google_logo.png',
                                   height: 24,
-                                ),
+                        ),
                                 const SizedBox(width: 10),
                                 const Text(
                                   'Continuer avec Google',
@@ -186,7 +186,7 @@ class MailScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                        ),
+                      ),
                     ],
                     ),
                   ),

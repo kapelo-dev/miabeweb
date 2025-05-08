@@ -187,34 +187,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
       backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
+            ? const Center(
+                child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6AAB64)),
-              ),
-            )
-          : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                ),
+              )
+            : _error != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                       const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
                       Text(
-                        _error!,
+                            _error!,
                         style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
                         onPressed: _loadOrders,
-                        style: ElevatedButton.styleFrom(
+                              style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
                           ),
-                          shape: RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
@@ -225,7 +225,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 )
               : Stack(
-                  children: [
+                    children: [
                     CustomScrollView(
                       slivers: [
                         SliverToBoxAdapter(
@@ -236,7 +236,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               children: [
                                 const Text(
                                   'Historique des commandes',
-                                  style: TextStyle(
+                                              style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
@@ -261,7 +261,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 padding: const EdgeInsets.all(16),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
+          children: [
                                     _buildStatItem(
                                       enCoursCount.toString(),
                                       'En cours',
@@ -305,10 +305,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     style: TextStyle(
                                       color: Colors.grey[600],
                                       fontSize: 16,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
+                          ],
+                        ),
                             ),
                           )
                         else
@@ -320,7 +320,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               ),
                               childCount: _orders.length,
                             ),
-                          ),
+                        ),
                       ],
                     ),
                     Positioned(
@@ -332,11 +332,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           color: Colors.black,
                         ),
                         onPressed: () => Navigator.pop(context),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-      ),
     );
   }
 
@@ -369,9 +369,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           style: TextStyle(
             fontSize: 12,
             color: Colors.grey[600],
+            ),
           ),
-        ),
-      ],
+        ],
     );
   }
 
