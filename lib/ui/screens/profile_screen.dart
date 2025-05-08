@@ -69,7 +69,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 40),
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
                       child: Text(
                         _getInitial(user),
                         style: const TextStyle(
@@ -352,8 +352,8 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                    ),
-                  ),
+                ),
+              ),
                   const SizedBox(height: 32),
                 ],
               ),

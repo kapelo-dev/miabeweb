@@ -101,8 +101,8 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
+        child: Column(
+          children: [
               Expanded(
                 flex: 2,
                 child: Container(
@@ -110,17 +110,17 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 20),
+            const SizedBox(height: 20),
                       const Text(
                         'MIAWOÉ ZON',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 10),
+            const SizedBox(height: 10),
                       const Text(
                         'Vérification OTP',
                         style: TextStyle(
@@ -136,9 +136,9 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
               Expanded(
                 flex: 3,
                 child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                     boxShadow: [
                       BoxShadow(
@@ -150,14 +150,14 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                   ),
                   padding: const EdgeInsets.all(20.0),
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: [
+              child: Column(
+                children: [
                         const Text(
                           'Code de vérification',
-                          style: TextStyle(
+                      style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF6AAB64),
+                          color: Color(0xFF6AAB64),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -165,7 +165,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                           padding: EdgeInsets.symmetric(horizontal: 30.0),
                           child: Text(
                             'Nous vous avons envoyé un code de vérification. Il sera automatiquement détecté.',
-                            textAlign: TextAlign.center,
+                          textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -238,27 +238,27 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                         if (countdown == 0)
                           TextButton(
                             onPressed: () {
-                              setState(() {
-                                countdown = 60;
+                            setState(() {
+                              countdown = 60;
                               });
                               startCountdown();
                               // Ici, vous pouvez ajouter la logique pour renvoyer le code
                             },
                             child: const Text(
                               'Renvoyer le code',
-                              style: TextStyle(
+                        style: TextStyle(
                                 color: Color(0xFF6AAB64),
-                                fontSize: 16,
+                          fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
+                    ),
+                  ),
               ),
-            ],
+            ),
+          ],
           ),
         ),
       ),

@@ -303,7 +303,7 @@ class AuthService {
   Future<void> signOut() async {
     await _prefs.clear();
     await _auth.signOut();
-    await _googleSignIn.signOut();
+        await _googleSignIn.signOut();
   }
 
   Future<app_models.User?> getCurrentUser(String userId) async {
