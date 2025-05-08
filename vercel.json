@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "build/web",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/build/web/$1"
+    }
+  ],
+  "buildCommand": "curl -fsSL https://flutter.dev/get-started/install/linux/linux-install.sh | bash && export PATH=\"$PATH:/usr/lib/flutter/bin\" && flutter build web",
+  "outputDirectory": "build/web"
+} 
